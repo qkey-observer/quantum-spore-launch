@@ -1,0 +1,18 @@
+{
+  "id": "genius-bsc",
+  "name": "genius.fun",
+  "chainName": "BSC",
+  "chainId": 56,
+  "factory": "0x78EAE9537C0ef90DFe9B7ae964682Fe8138afe31",
+  "deployer": "0xaB3eAD42ec2587D16BAE8f2c9Fb133c533C7fAAf",
+  "hook": "0xFf17F41c5Efd6CCe944Af0912F300097D62df5c9",
+  "feeEscrow": "0xFf8A2ae655E5851CB414Ac5aB41B311dA4287281",
+  "buybackVault": "0x6EcBe74E6CF896c610C34A3BE59Bd54c5A5B784E",
+  "router": "0x2EF00378984e84f2DAa08DfB5Fb03bBDE2038ae6",
+  "quote": {
+    "symbol": "IBMB",
+    "address": "0xfA273B076Feb8c0FB34e554ae341082323D016A3",
+    "decimals": 18
+  },
+  "note": "Addresses from https://genius.fun/docs/contracts release prod-foundation-20260916. Predict on the wired deployer, not the factory."
+}

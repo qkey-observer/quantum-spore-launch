@@ -1,0 +1,1142 @@
+{
+  "provenance": {
+    "chainId": 56,
+    "factory": "0x78EAE9537C0ef90DFe9B7ae964682Fe8138afe31",
+    "deployer": "0xaB3eAD42ec2587D16BAE8f2c9Fb133c533C7fAAf",
+    "hook": "0xFf17F41c5Efd6CCe944Af0912F300097D62df5c9",
+    "source": "genius.fun frontend ABI bundle 1884-6f167ef8b206dd66.js, release prod-foundation-20260916 / stack bnb-mainnet-m4.1",
+    "docs": "https://genius.fun/docs/contracts",
+    "note": "Slim ABI extracted from the public create-page bundle. Predict via wired deployer, not factory."
+  },
+  "factory": [
+    {
+      "type": "function",
+      "name": "approvedPairTokens",
+      "inputs": [
+        {
+          "name": "pairToken",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "approved",
+          "type": "bool",
+          "internalType": "bool"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "buybackVault",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract GeniusBuybackVault"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "canLaunch",
+      "inputs": [
+        {
+          "name": "launcher",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool",
+          "internalType": "bool"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "feeEscrow",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IGeniusFeeEscrow"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getLaunchConfig",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "tuple",
+          "internalType": "struct GeniusLaunchFactory.LaunchConfig",
+          "components": [
+            {
+              "name": "supply",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "curveFeeBps",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "phantomQuote",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "graduationThreshold",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "poolFee",
+              "type": "uint24",
+              "internalType": "uint24"
+            },
+            {
+              "name": "tickSpacing",
+              "type": "int24",
+              "internalType": "int24"
+            },
+            {
+              "name": "enabled",
+              "type": "bool",
+              "internalType": "bool"
+            }
+          ]
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "getLaunchedToken",
+      "inputs": [
+        {
+          "name": "token",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "tuple",
+          "internalType": "struct IGeniusLaunchFactory.LaunchedToken",
+          "components": [
+            {
+              "name": "token",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "curve",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "deployer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "creatorFeeRecipient",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "pairToken",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "graduationThreshold",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "poolFee",
+              "type": "uint24",
+              "internalType": "uint24"
+            },
+            {
+              "name": "tickSpacing",
+              "type": "int24",
+              "internalType": "int24"
+            },
+            {
+              "name": "creatorTaxBps",
+              "type": "uint16",
+              "internalType": "uint16"
+            },
+            {
+              "name": "buybackEnabled",
+              "type": "bool",
+              "internalType": "bool"
+            },
+            {
+              "name": "phase",
+              "type": "uint8",
+              "internalType": "enum GraduationPhase"
+            },
+            {
+              "name": "sweptQuote",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "sweptTokens",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "sweptAt",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "exists",
+              "type": "bool",
+              "internalType": "bool"
+            }
+          ]
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "launchConfigCount",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "launchDeployer",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract GeniusLaunchDeployer"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "launchEnabled",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool",
+          "internalType": "bool"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "launchFee",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "launchToken",
+      "inputs": [
+        {
+          "name": "params",
+          "type": "tuple",
+          "internalType": "struct GeniusLaunchFactory.TokenParams",
+          "components": [
+            {
+              "name": "name",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "logo",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "description",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "socials",
+              "type": "tuple",
+              "internalType": "struct GeniusLauncherToken.Socials",
+              "components": [
+                {
+                  "name": "twitter",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "telegram",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "discord",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "website",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "farcaster",
+                  "type": "string",
+                  "internalType": "string"
+                }
+              ]
+            },
+            {
+              "name": "creatorFeeRecipient",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "creatorTaxBps",
+              "type": "uint16",
+              "internalType": "uint16"
+            },
+            {
+              "name": "buybackEnabled",
+              "type": "bool",
+              "internalType": "bool"
+            },
+            {
+              "name": "expectedEconomics",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            },
+            {
+              "name": "salt",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            }
+          ]
+        },
+        {
+          "name": "launchConfigId",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "pairToken",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "snipeTaxExemptions",
+          "type": "address[]",
+          "internalType": "address[]"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "token",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "curve",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "launchToken",
+      "inputs": [
+        {
+          "name": "params",
+          "type": "tuple",
+          "internalType": "struct GeniusLaunchFactory.TokenParams",
+          "components": [
+            {
+              "name": "name",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "logo",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "description",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "socials",
+              "type": "tuple",
+              "internalType": "struct GeniusLauncherToken.Socials",
+              "components": [
+                {
+                  "name": "twitter",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "telegram",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "discord",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "website",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "farcaster",
+                  "type": "string",
+                  "internalType": "string"
+                }
+              ]
+            },
+            {
+              "name": "creatorFeeRecipient",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "creatorTaxBps",
+              "type": "uint16",
+              "internalType": "uint16"
+            },
+            {
+              "name": "buybackEnabled",
+              "type": "bool",
+              "internalType": "bool"
+            },
+            {
+              "name": "expectedEconomics",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            },
+            {
+              "name": "salt",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            }
+          ]
+        },
+        {
+          "name": "configId",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "pairToken",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "toFoundation",
+          "type": "bool",
+          "internalType": "bool"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "token",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "curve",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "launchToken",
+      "inputs": [
+        {
+          "name": "params",
+          "type": "tuple",
+          "internalType": "struct GeniusLaunchFactory.TokenParams",
+          "components": [
+            {
+              "name": "name",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "logo",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "description",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "socials",
+              "type": "tuple",
+              "internalType": "struct GeniusLauncherToken.Socials",
+              "components": [
+                {
+                  "name": "twitter",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "telegram",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "discord",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "website",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "farcaster",
+                  "type": "string",
+                  "internalType": "string"
+                }
+              ]
+            },
+            {
+              "name": "creatorFeeRecipient",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "creatorTaxBps",
+              "type": "uint16",
+              "internalType": "uint16"
+            },
+            {
+              "name": "buybackEnabled",
+              "type": "bool",
+              "internalType": "bool"
+            },
+            {
+              "name": "expectedEconomics",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            },
+            {
+              "name": "salt",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            }
+          ]
+        },
+        {
+          "name": "launchConfigId",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "pairToken",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "token",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "curve",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "maxCreatorTaxBps",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "memeHook",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IGeniusMemeHook"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "pairTokenEconomics",
+      "inputs": [
+        {
+          "name": "pairToken",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "phantomQuote",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "graduationThreshold",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "decimals",
+          "type": "uint8",
+          "internalType": "uint8"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "previewLaunchEconomics",
+      "inputs": [
+        {
+          "name": "launchConfigId",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "pairToken",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "snipeTaxSeconds",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "snipeTaxStartBps",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    }
+  ],
+  "deployer": [
+    {
+      "type": "function",
+      "name": "deployLaunch",
+      "inputs": [
+        {
+          "name": "params",
+          "type": "tuple",
+          "internalType": "struct LaunchDeployment",
+          "components": [
+            {
+              "name": "pairToken",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "creatorFeeRecipient",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "originalDeployer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "feePolicy",
+              "type": "address",
+              "internalType": "contract IGeniusFeePolicy"
+            },
+            {
+              "name": "policy",
+              "type": "tuple",
+              "internalType": "struct FeePolicySnapshot",
+              "components": [
+                {
+                  "name": "protocolFeeRecipient",
+                  "type": "address",
+                  "internalType": "address"
+                },
+                {
+                  "name": "protocolFeeShareBps",
+                  "type": "uint16",
+                  "internalType": "uint16"
+                },
+                {
+                  "name": "buybackBurnBps",
+                  "type": "uint16",
+                  "internalType": "uint16"
+                },
+                {
+                  "name": "hookFeeBps",
+                  "type": "uint16",
+                  "internalType": "uint16"
+                },
+                {
+                  "name": "maxInternalPriceImpactBps",
+                  "type": "uint16",
+                  "internalType": "uint16"
+                }
+              ]
+            },
+            {
+              "name": "feeEscrow",
+              "type": "address",
+              "internalType": "contract IGeniusFeeEscrow"
+            },
+            {
+              "name": "buybackVault",
+              "type": "address",
+              "internalType": "contract GeniusBuybackVault"
+            },
+            {
+              "name": "phantomQuote",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "curveFeeBps",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "creatorTaxBps",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "buybackEnabled",
+              "type": "bool",
+              "internalType": "bool"
+            },
+            {
+              "name": "graduationThreshold",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "supply",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "salt",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "logo",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "description",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "socials",
+              "type": "tuple",
+              "internalType": "struct GeniusLauncherToken.Socials",
+              "components": [
+                {
+                  "name": "twitter",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "telegram",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "discord",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "website",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "farcaster",
+                  "type": "string",
+                  "internalType": "string"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "token",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "curve",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "factory",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "predictLaunchAddresses",
+      "inputs": [
+        {
+          "name": "params",
+          "type": "tuple",
+          "internalType": "struct LaunchDeployment",
+          "components": [
+            {
+              "name": "pairToken",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "creatorFeeRecipient",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "originalDeployer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "feePolicy",
+              "type": "address",
+              "internalType": "contract IGeniusFeePolicy"
+            },
+            {
+              "name": "policy",
+              "type": "tuple",
+              "internalType": "struct FeePolicySnapshot",
+              "components": [
+                {
+                  "name": "protocolFeeRecipient",
+                  "type": "address",
+                  "internalType": "address"
+                },
+                {
+                  "name": "protocolFeeShareBps",
+                  "type": "uint16",
+                  "internalType": "uint16"
+                },
+                {
+                  "name": "buybackBurnBps",
+                  "type": "uint16",
+                  "internalType": "uint16"
+                },
+                {
+                  "name": "hookFeeBps",
+                  "type": "uint16",
+                  "internalType": "uint16"
+                },
+                {
+                  "name": "maxInternalPriceImpactBps",
+                  "type": "uint16",
+                  "internalType": "uint16"
+                }
+              ]
+            },
+            {
+              "name": "feeEscrow",
+              "type": "address",
+              "internalType": "contract IGeniusFeeEscrow"
+            },
+            {
+              "name": "buybackVault",
+              "type": "address",
+              "internalType": "contract GeniusBuybackVault"
+            },
+            {
+              "name": "phantomQuote",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "curveFeeBps",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "creatorTaxBps",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "buybackEnabled",
+              "type": "bool",
+              "internalType": "bool"
+            },
+            {
+              "name": "graduationThreshold",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "supply",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "salt",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "symbol",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "logo",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "description",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "socials",
+              "type": "tuple",
+              "internalType": "struct GeniusLauncherToken.Socials",
+              "components": [
+                {
+                  "name": "twitter",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "telegram",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "discord",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "website",
+                  "type": "string",
+                  "internalType": "string"
+                },
+                {
+                  "name": "farcaster",
+                  "type": "string",
+                  "internalType": "string"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "token",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "curve",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "view"
+    }
+  ],
+  "hook": [
+    {
+      "type": "function",
+      "name": "currentFeePolicy",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "tuple",
+          "internalType": "struct FeePolicySnapshot",
+          "components": [
+            {
+              "name": "protocolFeeRecipient",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "protocolFeeShareBps",
+              "type": "uint16",
+              "internalType": "uint16"
+            },
+            {
+              "name": "buybackBurnBps",
+              "type": "uint16",
+              "internalType": "uint16"
+            },
+            {
+              "name": "hookFeeBps",
+              "type": "uint16",
+              "internalType": "uint16"
+            },
+            {
+              "name": "maxInternalPriceImpactBps",
+              "type": "uint16",
+              "internalType": "uint16"
+            }
+          ]
+        }
+      ],
+      "stateMutability": "view"
+    }
+  ]
+}

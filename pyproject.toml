@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quantum-spore-launch"
+version = "1.0.0"
+description = "The world's first open-source quantum computer token launch engine. Powered by real IBM QPU measurements and EVM CREATE2."
+keywords = ["quantum-computing", "ibm-quantum", "qiskit", "create2", "token-launch", "web3", "genius-fun", "fair-launch"]
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "quantum-spore-launch contributors" }]
+
+[project.urls]
+Homepage = "https://qkey.observer"
+Repository = "https://github.com/qkey-observer/quantum-spore-launch"
+Explorer = "https://qkey.observer"
+dependencies = [
+  "pycryptodome>=3.20.0",
+  "eth-abi>=5.1.0",
+  "eth-account>=0.13.0",
+  "eth-utils>=5.1.0",
+  "hexbytes>=1.2.0",
+]
+
+[project.optional-dependencies]
+ibm = [
+  "qiskit>=1.2.0",
+  "qiskit-ibm-runtime>=0.30.0",
+]
+dev = [
+  "pytest>=8.0.0",
+]
+
+[project.scripts]
+quantum-launch = "quantum_launch.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+quantum_launch = ["abi/*.json", "data/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

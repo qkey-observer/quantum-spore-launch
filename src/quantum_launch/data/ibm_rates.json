@@ -1,0 +1,36 @@
+{
+  "retrievedAt": "2026-09-17T12:04:00Z",
+  "sourceUrl": "https://www.ibm.com/quantum/products",
+  "pricingUrl": "https://www.ibm.com/quantum/pricing",
+  "note": "ibm.com/quantum/pricing redirected to /quantum/products on this retrieval. Rates below are the figures printed on that page. Dedicated / On-Prem is quote-only; this file does not invent a number for it.",
+  "billing": "IBM bills QPU runtime, not wall-clock queue time. Pay-As-You-Go is billed per second of usage.",
+  "plans": {
+    "open": {
+      "name": "Open Plan",
+      "usdPerMinute": 0,
+      "cap": "10 minutes of runtime per month",
+      "minimumPurchase": null
+    },
+    "pay_as_you_go": {
+      "name": "Pay-As-You-Go Plan",
+      "usdPerMinute": 96,
+      "billing": "per second of usage",
+      "minimumPurchase": "1 second"
+    },
+    "flex": {
+      "name": "Flex Plan",
+      "usdPerMinute": 72,
+      "minimumPurchase": "400 minutes per year"
+    },
+    "premium": {
+      "name": "Premium Plan",
+      "usdPerMinute": 48,
+      "minimumPurchase": "5200 minutes per year"
+    },
+    "on_prem": {
+      "name": "On-Prem Plan",
+      "usdPerMinute": null,
+      "price": "Contact for quote"
+    }
+  }
+}

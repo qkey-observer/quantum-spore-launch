@@ -1,0 +1,21 @@
+{
+  "comment": "Live eth_call on BSC mainnet, 2026-09-18. Read-only. Bitstring 0111 against genius.fun wired deployer. imageUrl in the example plan is still a placeholder; changing it moves the address.",
+  "rpc": "https://bsc-dataseed.binance.org",
+  "chainId": 56,
+  "blockNumber": 122528395,
+  "blockHash": "0x804717f34d699043023fbe37629e4e36918f97872182582079dc5cd20c069c9d",
+  "bitstring": "0111",
+  "salt": "0x334fe1125e74700a86e339a5f102282ceaeb5a83bb3ca03cb42b44d576d6d9a0",
+  "planHash": "0x51c22bf62a5a1f30f657f33e9cbf5965868a0a77e2b0286b210da9bfcb551f35",
+  "initiator": "0xCEB16Fa2cA6d9E9608Da614dA24336314542A707",
+  "factory": "0x78EAE9537C0ef90DFe9B7ae964682Fe8138afe31",
+  "deployer": "0xaB3eAD42ec2587D16BAE8f2c9Fb133c533C7fAAf",
+  "pairToken": "0xfA273B076Feb8c0FB34e554ae341082323D016A3",
+  "canLaunch": true,
+  "launchEnabled": true,
+  "launchFeeWei": "2000000000000000",
+  "token": "0x999Ca7a3ba3cF02C29fc844caE603712222A2e81",
+  "curve": "0x58f0045529308B2CAd3713E8939795B8c0193A7c",
+  "tokenCode": "0x",
+  "curveCode": "0x"
+}

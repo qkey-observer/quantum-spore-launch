@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 2,
+  "mode": "direct",
+  "width": 64,
+  "shotsPerSpec": 2,
+  "maxDelaySeconds": 3600,
+  "msbFirst": true,
+  "alphabet": "ABCDEFGHJKLMNPQRSTUVWXYZ23456789",
+  "comment": "Public-claim encoding. Published BEFORE the job. Name and symbol are spelled from this alphabet using the measured bits — no QKEY table. Quote, logo, config id and opening buy are indices into menus (real addresses/URLs). initiator and factory stay classical. Description is the bitstring itself.",
+  "circuit": {
+    "kind": "hardware_efficient",
+    "qubits": 64,
+    "layers": 16,
+    "angleSeed": "qkey-entropy-v1"
+  },
+  "menus": {
+    "quotes": [
+      {
+        "symbol": "BNB",
+        "name": "BNB",
+        "address": "0x0000000000000000000000000000000000000000",
+        "decimals": 18
+      },
+      {
+        "symbol": "IBMB",
+        "name": "IBM",
+        "address": "0xfA273B076Feb8c0FB34e554ae341082323D016A3",
+        "decimals": 18
+      }
+    ],
+    "logos": [
+      "https://example.invalid/logo-0.png",
+      "https://example.invalid/logo-1.png",
+      "https://example.invalid/logo-2.png",
+      "https://example.invalid/logo-3.png"
+    ],
+    "feeRecipients": [
+      "0xcFf79628E6eDA1ECd4Bd16eEA4B004fbF8F739e8",
+      "0xCEB16Fa2cA6d9E9608Da614dA24336314542A707"
+    ],
+    "exemptCandidates": [
+      "0xCEB16Fa2cA6d9E9608Da614dA24336314542A707",
+      "0xcFf79628E6eDA1ECd4Bd16eEA4B004fbF8F739e8"
+    ],
+    "backends": ["ibm_fez", "ibm_marrakesh", "ibm_torino", "ibm_brisbane", "ibm_sherbrooke", "ibm_kyiv", "ibm_brussels", "ibm_strasbourg"],
+    "shotTiers": [16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16, 32, 64, 128, 256, 512],
+    "websiteBase": "https://qkey.observer/t"
+  },
+  "fields": {
+    "launch": { "bits": [0], "when": "1" },
+    "creatorTaxBps": { "bits": [1, 2, 3, 4, 5, 6, 7, 8], "max": 1000 },
+    "delaySeconds": { "bits": [9, 10, 11, 12, 13, 14], "scale": 10 },
+    "buyback": { "bits": [15] },
+    "feeDestination": { "bits": [16], "zero": "creator_payout", "one": "foundation" },
+    "quote": { "bits": [17, 18] },
+    "logo": { "bits": [19, 20] },
+    "launchConfigId": { "bits": [21, 22] },
+    "openingBuy": { "bits": [23, 24, 25, 26, 27, 28], "scale": 1 },
+    "name": { "bits": [29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48] },
+    "symbol": { "bits": [49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63] },
+    "extraName": { "bits": [64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83] },
+    "feeRecipient": { "bits": [84, 85, 86, 87, 88, 89, 90, 91] },
+    "exemptions": { "bits": [92, 93, 94, 95] },
+    "nextLayers": { "bits": [96, 97, 98, 99] },
+    "nextShots": { "bits": [100, 101, 102, 103] },
+    "nextBackend": { "bits": [104, 105, 106] },
+    "website": { "bits": [107] },
+    "x": { "bits": [108, 109, 110, 111, 112] },
+    "telegram": { "bits": [113, 114, 115, 116, 117] }
+  }
+}

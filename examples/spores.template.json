@@ -1,0 +1,40 @@
+{
+  "_readme": [
+    "Capture template for the quantum run. The session is short and cannot be repeated cheaply, so collect every field below in the same session.",
+    "usageSeconds is BILLED QPU execution time; submittedAt/ranAt/completedAt are wall clock including queue. They differ by orders of magnitude.",
+    "measurements MUST be the ordered per-shot bitstrings, not aggregated counts.",
+    "counts and measurements are cross-checked: if both are present they must agree exactly.",
+    "qubitLayout is the physical qubits the transpiler used.",
+    "This file is the site-compatible shape (job, plan, spores). The program also writes run.json with the frozen plan and cost ledger."
+  ],
+  "job": {
+    "id": "REPLACE-ibm-runtime-job-id",
+    "device": "ibm_fez",
+    "shots": 1024,
+    "submittedAt": "REPLACE-ISO-8601",
+    "ranAt": "REPLACE-ISO-8601",
+    "completedAt": "REPLACE-ISO-8601",
+    "usageSeconds": 0,
+    "queueDepthAtSubmit": 0,
+    "circuitDepth": 0,
+    "circuitQasm": "REPLACE-with-the-transpiled-OPENQASM-source",
+    "qubitLayout": [],
+    "measurements": [],
+    "counts": {},
+    "calibration": {
+      "snapshotAt": "REPLACE-ISO-8601",
+      "readoutError": 0,
+      "twoQubitError": 0,
+      "singleQubitError": 0,
+      "t1Micros": 0,
+      "t2Micros": 0
+    }
+  },
+  "plan": {
+    "chainId": 56,
+    "factoryAddress": "0x78EAE9537C0ef90DFe9B7ae964682Fe8138afe31",
+    "initiator": "0xCEB16Fa2cA6d9E9608Da614dA24336314542A707",
+    "planHash": "REPLACE-from-quantum-launch-derive"
+  },
+  "spores": []
+}

@@ -1,0 +1,44 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - name: Python tests
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+          pytest
+      - name: JS derivation vectors
+        run: |
+          npm ci
+          npm test
+      - name: Reproduce published 0111 salt
+        run: python -m quantum_launch derive --bitstring 0111
+      - name: Offline record self-checks & derivation tests
+        run: |
+          python -m quantum_launch verify examples/verify-live-0111.json
+          python -m quantum_launch verify examples/verify-live-64qubit.json
+      - name: Live BSC mainnet CREATE2 deployer & bytecode audit
+        run: |
+          python -m quantum_launch inspect --platform genius-bsc --rpc https://bsc-dataseed.binance.org
+          python -m quantum_launch verify examples/verify-live-0111.json --rpc https://bsc-dataseed.binance.org
+          python -m quantum_launch verify examples/verify-live-64qubit.json --rpc https://bsc-dataseed.binance.org
+      - name: Install IBM Qiskit dependencies & verify circuit synthesis
+        run: |
+          pip install -e ".[ibm]"
+          python -m quantum_launch probe-extraction --qubits 64 --shots 16
+          python -m quantum_launch map --map examples/launch-map.direct.json --bitstring 1001001000010000000100000000000000000000000000000000000000000000

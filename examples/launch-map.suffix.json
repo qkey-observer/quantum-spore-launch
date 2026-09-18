@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 2,
+  "mode": "direct",
+  "width": 32,
+  "msbFirst": true,
+  "comment": "Older 32-bit suffix encoding (QKEY- + hex). Kept so the 32-bit tests stay pinned. The public-claim file is launch-map.direct.json.",
+  "circuit": {
+    "kind": "hardware_efficient",
+    "qubits": 32,
+    "layers": 8,
+    "angleSeed": "qkey-entropy-v1"
+  },
+  "fields": {
+    "launch": { "bits": [0], "when": "1" },
+    "creatorTaxBps": { "bits": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "max": 1000 },
+    "delaySeconds": { "bits": [11, 12, 13, 14, 15, 16, 17, 18], "scale": 10 },
+    "buyback": { "bits": [19] },
+    "feeDestination": { "bits": [20], "zero": "creator_payout", "one": "foundation" },
+    "suffix": { "bits": [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31], "namePrefix": "QKEY", "symbolPrefix": "Q" }
+  }
+}

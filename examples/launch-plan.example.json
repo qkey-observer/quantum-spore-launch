@@ -1,0 +1,50 @@
+{
+  "generation": 0,
+  "label": "QKEY · genesis pool",
+  "chain": {
+    "name": "BSC",
+    "chainId": 56
+  },
+  "platform": {
+    "name": "genius.fun",
+    "createUrl": "https://genius.fun/create"
+  },
+  "quote": {
+    "symbol": "IBMB",
+    "name": "IBM",
+    "address": "0xfA273B076Feb8c0FB34e554ae341082323D016A3",
+    "decimals": 18
+  },
+  "token": {
+    "name": "QKEY",
+    "symbol": "QKEY",
+    "description": "Replace with the public description before a real prediction.",
+    "imageUrl": "https://example.invalid/qkey.png",
+    "website": "",
+    "x": "",
+    "telegram": "",
+    "discord": "",
+    "farcaster": ""
+  },
+  "launch": {
+    "launchConfigId": 0,
+    "openingBuy": "0",
+    "creatorTaxPercent": "0",
+    "creatorTaxBps": 0,
+    "creatorFeeRecipient": "0xcFf79628E6eDA1ECd4Bd16eEA4B004fbF8F739e8",
+    "feeDestination": "creator_payout",
+    "buybackAndLock": false,
+    "exemptAddresses": []
+  },
+  "initiator": "0xCEB16Fa2cA6d9E9608Da614dA24336314542A707",
+  "treasury": {
+    "address": "0xcFf79628E6eDA1ECd4Bd16eEA4B004fbF8F739e8",
+    "chainId": 56,
+    "asset": {
+      "symbol": "IBMB",
+      "address": "0xfA273B076Feb8c0FB34e554ae341082323D016A3",
+      "decimals": 18
+    },
+    "note": "Creator fees are paid straight here. This address feeds the predicted launch address and cannot change after a prediction is published."
+  }
+}

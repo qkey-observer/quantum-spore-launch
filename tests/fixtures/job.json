@@ -1,0 +1,29 @@
+{
+  "id": "d3k91f-003",
+  "device": "ibm_fez",
+  "shots": 4,
+  "submittedAt": "2026-09-17T10:00:00.000Z",
+  "ranAt": "2026-09-17T10:00:05.000Z",
+  "completedAt": "2026-09-17T10:00:08.000Z",
+  "usageSeconds": 2.4,
+  "wallSeconds": 180.0,
+  "queueDepthAtSubmit": 12,
+  "circuitDepth": 3,
+  "circuitQasm": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[4];\ncreg c[4];\nh q[0];\nh q[1];\nh q[2];\nh q[3];\nmeasure q[0] -> c[0];\nmeasure q[1] -> c[1];\nmeasure q[2] -> c[2];\nmeasure q[3] -> c[3];\n",
+  "qubitLayout": [12, 13, 17, 21],
+  "measurements": ["0111", "1010", "0000", "1111"],
+  "counts": {
+    "0111": 1,
+    "1010": 1,
+    "0000": 1,
+    "1111": 1
+  },
+  "calibration": {
+    "snapshotAt": "2026-09-17T09:59:00.000Z",
+    "readoutError": 0.012,
+    "twoQubitError": 0.008,
+    "singleQubitError": 0.0004,
+    "t1Micros": 180.2,
+    "t2Micros": 120.5
+  }
+}

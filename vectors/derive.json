@@ -1,0 +1,67 @@
+{
+  "comment": "Authority vectors. salt = keccak256(utf8_bytes(bitstring)); planHash = keccak256(utf8(canonical_json(plan))) with keys sorted recursively. Python and js/derive.mjs must match these byte-for-byte.",
+  "salt": [
+    {
+      "bitstring": "0111",
+      "salt": "0x334fe1125e74700a86e339a5f102282ceaeb5a83bb3ca03cb42b44d576d6d9a0"
+    },
+    {
+      "bitstring": "0000",
+      "salt": "0xe8d1f6cb90fef5fc9696cc77858b42d4e99b0959246d86f4584b49f5af0fe3f9"
+    },
+    {
+      "bitstring": "1111",
+      "salt": "0x3531cc3dc5bb231b65d260771886cc583d8fe8fb29b457554cb1930a722a747d"
+    },
+    {
+      "bitstring": "1010",
+      "salt": "0x578b93b62a110a7a4f03d18a7146d78b7e4ad5f48df01b90c555649fea625487"
+    },
+    {
+      "bitstring": "01010101",
+      "salt": "0xef5bbbead62a9096ca8c50bed77c621f7e8bb40ae93be31af28298c0bdff27e5"
+    },
+    {
+      "bitstring": "11",
+      "salt": "0x7880aec93413f117ef14bd4e6d130875ab2c7d7d55a064fac3c2f7bd51516380"
+    }
+  ],
+  "saltRejected": ["", "0", "2", "abcd", "01 11", "1", "012", "0x01"],
+  "planHash": [
+    {
+      "name": "qkey-tax-0",
+      "plan": { "chainId": 56, "token": { "name": "QKEY", "symbol": "QKEY" }, "tax": "0" },
+      "hash": "0xda248d92d4c16bc3438c37f95a45a7ecdbd3020520c5cb99b37395a41f82ece2"
+    },
+    {
+      "name": "qkey-tax-0-reordered",
+      "plan": { "tax": "0", "token": { "symbol": "QKEY", "name": "QKEY" }, "chainId": 56 },
+      "hash": "0xda248d92d4c16bc3438c37f95a45a7ecdbd3020520c5cb99b37395a41f82ece2"
+    },
+    {
+      "name": "qkey-tax-1",
+      "plan": { "chainId": 56, "token": { "name": "QKEY", "symbol": "QKEY" }, "tax": "1" },
+      "hash": "0x37930f0c89deb0b0e993ae3cfe4bad923e7ad22ab7c51ba40ae4813140f3e481"
+    },
+    {
+      "name": "array-1-2",
+      "plan": { "a": [1, 2] },
+      "hash": "0x5092155cfb7823394cdd34eff9a150bb9909738d4b91a11d275433cef79bf397"
+    },
+    {
+      "name": "array-2-1",
+      "plan": { "a": [2, 1] },
+      "hash": "0x9fdd1609b7153e97081126556a797dfacd84ec25a76f57cf09ce3d53851caece"
+    },
+    {
+      "name": "explicit-null",
+      "plan": { "a": null },
+      "hash": "0x65d3c8cdeff108be89857a5d435e711525c34c5e0e382d70d4bf6ba57ef9fffe"
+    },
+    {
+      "name": "empty-object",
+      "plan": {},
+      "hash": "0xb48d38f93eaa084033fc5970bf96e559c33c4cdc07d889ab00b4d63f9590739d"
+    }
+  ]
+}

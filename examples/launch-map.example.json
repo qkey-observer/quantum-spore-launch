@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "width": 4,
+  "msbFirst": true,
+  "comment": "Published BEFORE any measurement. mapHash = keccak256(utf8(canonical(this object without comment))). Changing a rule after seeing bits is a different hash. Bit 0 (MSB) decides launch vs skip so skipped rounds are forced and must be published.",
+  "launchBit": 0,
+  "launchWhen": "1",
+  "taxBits": [1, 2],
+  "taxTiersBps": [0, 50, 100, 200],
+  "delayBits": [3],
+  "delayTiersSeconds": [0, 300],
+  "nameBits": [1, 2],
+  "names": {
+    "00": { "name": "QKEY", "symbol": "QKEY" },
+    "01": { "name": "QKEY", "symbol": "QKEYA" },
+    "10": { "name": "QKEY", "symbol": "QKEYB" },
+    "11": { "name": "QKEY", "symbol": "QKEYC" }
+  }
+}

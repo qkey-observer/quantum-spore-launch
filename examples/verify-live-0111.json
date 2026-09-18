@@ -1,0 +1,112 @@
+{
+  "schema": "quantum-spore-launch/v1",
+  "job": {
+    "id": "d3k91f-003",
+    "device": "ibm_fez",
+    "shots": 4,
+    "submittedAt": "2026-09-17T10:00:00.000Z",
+    "ranAt": "2026-09-17T10:00:05.000Z",
+    "completedAt": "2026-09-17T10:00:08.000Z",
+    "usageSeconds": 2.4,
+    "wallSeconds": 180.0,
+    "queueDepthAtSubmit": 12,
+    "circuitDepth": 3,
+    "circuitQasm": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[4];\ncreg c[4];\nh q[0];\nh q[1];\nh q[2];\nh q[3];\nmeasure q[0] -> c[0];\nmeasure q[1] -> c[1];\nmeasure q[2] -> c[2];\nmeasure q[3] -> c[3];\n",
+    "qubitLayout": [
+      12,
+      13,
+      17,
+      21
+    ],
+    "measurements": [
+      "0111",
+      "1010",
+      "0000",
+      "1111"
+    ],
+    "counts": {
+      "0111": 1,
+      "1010": 1,
+      "0000": 1,
+      "1111": 1
+    },
+    "calibration": {
+      "snapshotAt": "2026-09-17T09:59:00.000Z",
+      "readoutError": 0.012,
+      "twoQubitError": 0.008,
+      "singleQubitError": 0.0004,
+      "t1Micros": 180.2,
+      "t2Micros": 120.5
+    }
+  },
+  "plan": {
+    "chainId": 56,
+    "factoryAddress": "0x78EAE9537C0ef90DFe9B7ae964682Fe8138afe31",
+    "initiator": "0xCEB16Fa2cA6d9E9608Da614dA24336314542A707",
+    "planHash": "0x51c22bf62a5a1f30f657f33e9cbf5965868a0a77e2b0286b210da9bfcb551f35",
+    "frozen": {
+      "generation": 0,
+      "label": "QKEY \u00b7 genesis pool",
+      "chain": {
+        "name": "BSC",
+        "chainId": 56
+      },
+      "platform": {
+        "name": "genius.fun",
+        "createUrl": "https://genius.fun/create",
+        "id": "genius-bsc"
+      },
+      "quote": {
+        "symbol": "IBMB",
+        "name": "IBM",
+        "address": "0xfA273B076Feb8c0FB34e554ae341082323D016A3",
+        "decimals": 18
+      },
+      "token": {
+        "name": "QKEY",
+        "symbol": "QKEY",
+        "description": "Replace with the public description before a real prediction.",
+        "imageUrl": "https://example.invalid/qkey.png",
+        "website": "",
+        "x": "",
+        "telegram": "",
+        "discord": "",
+        "farcaster": ""
+      },
+      "launch": {
+        "launchConfigId": 0,
+        "openingBuy": "0",
+        "creatorTaxPercent": "0",
+        "creatorTaxBps": 0,
+        "creatorFeeRecipient": "0xcFf79628E6eDA1ECd4Bd16eEA4B004fbF8F739e8",
+        "feeDestination": "creator_payout",
+        "buybackAndLock": false,
+        "exemptAddresses": []
+      },
+      "initiator": "0xCEB16Fa2cA6d9E9608Da614dA24336314542A707",
+      "treasury": {
+        "address": "0xcFf79628E6eDA1ECd4Bd16eEA4B004fbF8F739e8",
+        "chainId": 56,
+        "asset": {
+          "symbol": "IBMB",
+          "address": "0xfA273B076Feb8c0FB34e554ae341082323D016A3",
+          "decimals": 18
+        },
+        "note": "Creator fees are paid straight here. This address feeds the predicted launch address and cannot change after a prediction is published."
+      },
+      "factoryAddress": "0x78EAE9537C0ef90DFe9B7ae964682Fe8138afe31",
+      "deployerAddress": "0xaB3eAD42ec2587D16BAE8f2c9Fb133c533C7fAAf"
+    }
+  },
+  "spores": [
+    {
+      "shot": 1,
+      "bitstring": "0111",
+      "salt": "0x334fe1125e74700a86e339a5f102282ceaeb5a83bb3ca03cb42b44d576d6d9a0",
+      "address": "0x999Ca7a3ba3cF02C29fc844caE603712222A2e81",
+      "curveAddress": "0x58f0045529308B2CAd3713E8939795B8c0193A7c",
+      "status": "awaiting_launch",
+      "predictedAt": "2026-09-18T00:00:00.000Z"
+    }
+  ]
+}

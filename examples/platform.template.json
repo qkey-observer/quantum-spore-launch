@@ -1,0 +1,19 @@
+{
+  "id": "your-pad",
+  "name": "REPLACE-launchpad-name",
+  "chainName": "REPLACE",
+  "chainId": 0,
+  "factory": "0x0000000000000000000000000000000000000000",
+  "deployer": "0x0000000000000000000000000000000000000000",
+  "hook": "0x0000000000000000000000000000000000000000",
+  "feeEscrow": "0x0000000000000000000000000000000000000000",
+  "buybackVault": "0x0000000000000000000000000000000000000000",
+  "router": "0x0000000000000000000000000000000000000000",
+  "quote": {
+    "symbol": "REPLACE",
+    "address": "0x0000000000000000000000000000000000000000",
+    "decimals": 18
+  },
+  "abiFile": "genius_bsc.json",
+  "note": "Predict on the wired CREATE2 deployer, not the factory. originalDeployer is the initiating EOA. Copy genius-bsc.json and replace every address after a live inspect."
+}

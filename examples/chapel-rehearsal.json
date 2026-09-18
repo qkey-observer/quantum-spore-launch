@@ -1,0 +1,16 @@
+{
+  "comment": "Local Anvil --chain-id 97, not public BSC chapel. genius.fun factory/deployer have empty code on chapel 97. This rehearsal used a QuantumChapelFactory CREATE2 launch whose salt is keccak256(utf8('0111')), then eth_getCode. Public chapel still needs a funded testnet key.",
+  "chainId": 97,
+  "network": "anvil-local-chain-id-97",
+  "bitstring": "0111",
+  "salt": "0x334fe1125e74700a86e339a5f102282ceaeb5a83bb3ca03cb42b44d576d6d9a0",
+  "factory": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "predictedToken": "0xdB4488B3922009F3bCFF5A08D978F66436B9Bb68",
+  "codeBefore": "0x",
+  "launchTx": "0xab13c5e45dae0e260de226882cbb09ece10024a23000f9662ca394ab2867589f",
+  "status": "0x1",
+  "blockNumber": 3,
+  "codeBytesAfter": 475,
+  "onChainBitstring": "0111",
+  "onChainSaltUsed": "0x334fe1125e74700a86e339a5f102282ceaeb5a83bb3ca03cb42b44d576d6d9a0"
+}

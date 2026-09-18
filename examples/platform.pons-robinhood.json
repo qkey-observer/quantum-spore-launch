@@ -1,0 +1,18 @@
+{
+  "id": "pons-robinhood",
+  "name": "Pons V2",
+  "chainName": "Robinhood Chain",
+  "chainId": 4663,
+  "factory": "0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e",
+  "deployer": "0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42",
+  "hook": "0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044",
+  "feeEscrow": "0xd3AFEB2a57f70eF218Aa82451c51B2fb0416Ac9e",
+  "buybackVault": "0x42df2a798f82289E177311362e8f5ccC45c1219c",
+  "router": "0xe33E9E479dF8802cb0866d5d05258bEc4cF62948",
+  "quote": {
+    "symbol": "ETH",
+    "address": "0x0000000000000000000000000000000000000000",
+    "decimals": 18
+  },
+  "note": "Second target. Predict on the wired deployer. Native quote in the original Pons tooling."
+}
