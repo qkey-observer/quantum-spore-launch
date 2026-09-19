@@ -123,7 +123,9 @@ A 64-qubit hardware-efficient state measured on `ibm_marrakesh` (16 layers, 3,12
 | **CREATE2 Token Address** | `0x2c670B551d2B15c68eE08E492Ed2506eC22e6F83` | Deterministic genius.fun deployer prediction |
 | **Bonding Curve Pool** | `0x3e7d5b01FE7909714b6ECe1bAa9D15c518fAeDa5` | Deterministic bonding curve pair |
 | **Mainnet Block** | `122553987` | Verified live on BSC mainnet |
-| **Bytecode Audit** | `RESERVED_AWAITING_BROADCAST (codeSize=0 bytes)` | Verified via `eth_getCode` |
+| **Bytecode Audit** | no code at either address (`codeSize=0`) | `eth_getCode` returned empty — not deployed |
+
+> **These two addresses hold no contract.** They are CREATE2 predictions for the example plan, computed against the genius.fun wired deployer and checked with `eth_getCode` at the block above, which returned empty. Nothing has been launched at them and nothing is reserved — anyone with the same frozen plan and the same bitstring derives the same pair. Change any frozen field and both move.
 
 ```bash
 # Verify 64-qubit vector against live BSC public RPC:
@@ -143,7 +145,9 @@ A minimal 4-qubit Hadamard test vector for rapid local demonstration:
 | **CREATE2 Token Address** | `0x999Ca7a3ba3cF02C29fc844caE603712222A2e81` | Deterministic genius.fun deployer prediction |
 | **Bonding Curve Pool** | `0x58f0045529308B2CAd3713E8939795B8c0193A7c` | Deterministic bonding curve pair |
 | **Mainnet Block** | `122550017` | Verified live on BSC mainnet |
-| **Bytecode Audit** | `RESERVED_AWAITING_BROADCAST (codeSize=0 bytes)` | Verified via `eth_getCode` |
+| **Bytecode Audit** | no code at either address (`codeSize=0`) | `eth_getCode` returned empty — not deployed |
+
+> **These two addresses hold no contract.** They are CREATE2 predictions for the example plan, computed against the genius.fun wired deployer and checked with `eth_getCode` at the block above, which returned empty. Nothing has been launched at them and nothing is reserved — anyone with the same frozen plan and the same bitstring derives the same pair. Change any frozen field and both move.
 
 ```bash
 # Verify 4-bit demo vector against live BSC public RPC:

@@ -1,5 +1,5 @@
 {
-  "comment": "Live eth_call on BSC mainnet, 2026-09-18. Read-only. Bitstring 0111 against genius.fun wired deployer. imageUrl in the example plan is still a placeholder; changing it moves the address.",
+  "comment": "Live eth_call on BSC mainnet, 2026-09-18. Read-only. Bitstring 0111 against genius.fun wired deployer. imageUrl in the example plan is still a placeholder; changing it moves the address. tokenCode and curveCode are both empty: these are predicted addresses with no contract deployed at them, not a launch record.",
   "rpc": "https://bsc-dataseed.binance.org",
   "chainId": 56,
   "blockNumber": 122528395,

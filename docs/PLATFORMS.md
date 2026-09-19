@@ -37,8 +37,45 @@ Live read-only prediction of `0111` is in `examples/live-predict-0111.json`.
 
 ## Second adapter: Pons V2 (Robinhood Chain)
 
-`--platform pons-robinhood` or `examples/platform.pons-robinhood.json`.
-Same CREATE2 tuple shape. Native quote in the original Pons tooling.
+File: `examples/platform.pons-robinhood.json`. Built-in id: `pons-robinhood`.
+
+| Role | Address |
+| --- | --- |
+| Factory | `0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e` |
+| Wired launch deployer | `0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42` |
+| Quote | native ETH (`0x0000…0000`) |
+| Router | `0xe33E9E479dF8802cb0866d5d05258bEc4cF62948` |
+| Hook | `0xE5e702641Ea86F4ae6cC3cDaeD2B886f976Be044` |
+| Fee escrow | `0xd3AFEB2a57f70eF218Aa82451c51B2fb0416Ac9e` |
+| Buyback vault | `0x42df2a798f82289E177311362e8f5ccC45c1219c` |
+
+Chain `4663`, public RPC `https://rpc.mainnet.chain.robinhood.com`, explorer
+[robinhoodchain.blockscout.com](https://robinhoodchain.blockscout.com/). Every
+address above was confirmed to hold code at block 66658781; the factory,
+deployer and escrow are also verified on
+[Sourcify](https://sourcify.dev/server/v2/contract/4663/0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e).
+
+genius.fun is a Pons v2 fork, so the CREATE2 tuple shape is the same and the
+same rule applies: **predict on the wired deployer**, not the factory, and
+`originalDeployer` is the initiating EOA. Two differences matter.
+
+- **The quote is native ETH, not an ERC-20.** A buy sends value rather than
+  approving a token, and a treasury on this chain is read with
+  `eth_getBalance` instead of a `balanceOf` call.
+- **Fees accrue in the escrow and are not a wallet balance.** The recipient
+  claims them in a separate transaction. An address showing nothing on the
+  explorer can still have fees waiting.
+
+```sh
+python -m quantum_launch inspect --platform pons-robinhood
+python -m quantum_launch predict --platform pons-robinhood \
+  --plan examples/launch-plan.example.json --bitstring 0111
+```
+
+A plan frozen for one chain does not carry to the other. `chainId`, the
+factory and the quote asset all feed the init code, so the same bitstring
+gives a different address on 4663 than on 56 — which is the point: the
+measurement picks the address, the platform decides what that address is.
 
 ## Adding a pad
 

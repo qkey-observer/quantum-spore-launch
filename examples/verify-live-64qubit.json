@@ -1,4 +1,5 @@
 {
+  "comment": "Worked 64-qubit example. The spore addresses below are CREATE2 predictions checked with eth_getCode against a public BSC RPC; both returned empty. No contract is deployed at them and this is not a launch record.",
   "schema": "quantum-spore-launch/v1",
   "job": {
     "id": "cpt1m5p0p4ag00851vkg",

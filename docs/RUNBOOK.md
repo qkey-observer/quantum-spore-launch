@@ -24,7 +24,8 @@ python -m quantum_launch predict --platform genius-bsc \
 
 Expected token for that example plan and `0111`:
 `0x999Ca7a3ba3cF02C29fc844caE603712222A2e81`. Changing `imageUrl` or any
-other frozen field moves it.
+other frozen field moves it. Nothing is deployed there: it is what the
+deployer would produce, not a contract that exists.
 
 ## 0b. Probe the per-shot path (no QPU bill)
 
