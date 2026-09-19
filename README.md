@@ -33,7 +33,7 @@
 
 Official protocol explorer, interactive verification dashboard, and real-time spore telemetry are available at **[https://qkey.observer](https://qkey.observer)**.
 
-The project interfaces with two verified launchpads: **[Pons V2](https://www.ponsfamily.com)** on **Robinhood Chain** and the **[genius.fun](https://genius.fun)** bonding curve launchpad on **Binance Smart Chain**. genius.fun is a Pons v2 fork, so both share the same CREATE2 tuple shape and the same rule — predict against the factory's **wired launch deployer**, never the factory itself — to cryptographically lock and pre-compute token addresses before any deployment transaction is broadcast.
+The project interfaces with two verified launchpads: **[Pons V2](https://www.ponsfamily.com/launchpad/create)** on **Robinhood Chain** and the **[genius.fun](https://genius.fun)** bonding curve launchpad on **Binance Smart Chain**. genius.fun is a Pons v2 fork, so both share the same CREATE2 tuple shape and the same rule — predict against the factory's **wired launch deployer**, never the factory itself — to cryptographically lock and pre-compute token addresses before any deployment transaction is broadcast.
 
 ```
 +-------------------------------------------------------------------------+
