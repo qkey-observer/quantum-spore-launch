@@ -33,15 +33,25 @@
 
 Official protocol explorer, interactive verification dashboard, and real-time spore telemetry are available at **[https://qkey.observer](https://qkey.observer)**.
 
-The project interfaces with the official **[genius.fun](https://genius.fun)** bonding curve launchpad on **Binance Smart Chain (BSC)**, utilizing the factory's verified on-chain deployer to cryptographically lock and pre-compute token addresses before any deployment transaction is broadcast.
+The project interfaces with two verified launchpads: **Pons V2** on **Robinhood Chain** and the **[genius.fun](https://genius.fun)** bonding curve launchpad on **Binance Smart Chain**. genius.fun is a Pons v2 fork, so both share the same CREATE2 tuple shape and the same rule — predict against the factory's **wired launch deployer**, never the factory itself — to cryptographically lock and pre-compute token addresses before any deployment transaction is broadcast.
 
 ```
 +-------------------------------------------------------------------------+
-|                  Official genius.fun BSC Infrastructure                 |
+|              Pons V2 Infrastructure - Robinhood Chain (4663)            |
+|  Factory:         0x7eD598BcEf8bd9Edd8C97A195C6d13f40801EC7e            |
+|  LaunchDeployer:  0x3711ceA4feaDE896C913C68F01Eda97Cb06D1A42            |
+|  Quote asset:     ERC-20 approved by the factory (zero address is not)  |
++-------------------------------------------------------------------------+
+|              genius.fun Infrastructure - BNB Smart Chain (56)           |
 |  Factory:         0x78EAE9537C0ef90DFe9B7ae964682Fe8138afe31            |
 |  LaunchDeployer:  0xaB3eAD42ec2587D16BAE8f2c9Fb133c533C7fAAf            |
+|  Quote asset:     IBMB  0xfA273B076Feb8c0FB34e554ae341082323D016A3      |
 +-------------------------------------------------------------------------+
 ```
+
+Both address sets were read from their own chains and confirmed to hold code.
+See [`docs/PLATFORMS.md`](docs/PLATFORMS.md) for the full tables, the public
+RPCs and the two differences that actually bite when switching between them.
 
 ---
 
