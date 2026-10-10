@@ -1,11 +1,13 @@
 {
-  "name": "quantum-spore-service",
+  "name": "quantum-spore-launch",
   "version": "0.1.0",
   "private": false,
   "license": "MIT",
   "type": "module",
   "description": "Read-only multi-chain service: derive the address a measured bitstring fixes, and read balances across EVM chains and Solana. Never signs, sends or deploys.",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "start": "node src/server.mjs",
