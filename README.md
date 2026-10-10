@@ -1,12 +1,18 @@
 # quantum-spore-service
 
-A read-only service that does two things with a quantum measurement:
+Tooling for a launch whose address is fixed by a quantum measurement rather than
+chosen:
 
-1. **Derives the address a measured bitstring fixes**, on EVM chains and on Solana.
-2. **Reads balances across those chains** and reports them as one figure, or says plainly why it cannot.
+1. **Derive the address a measured bitstring fixes**, on EVM chains and on Solana.
+2. **Read balances across those chains** and report them as one figure, or say
+   plainly why that figure cannot be produced.
+3. **Prepare a pump.fun launch** at the derived address: build the transaction,
+   simulate it against the live program, and leave it unsigned.
 
-It never signs, never sends, never deploys, and holds no keys. There is no write
-path in this process — not disabled behind a flag, absent.
+The service in `src/server.mjs` has no write path — not disabled behind a flag,
+absent — and no keys. The launch CLI is where signing and sending live, as two
+separate commands that nothing else calls. [Read-only, enforced](#read-only-enforced)
+says exactly which guarantee covers which part.
 
 ## Why a bitstring can fix an address
 
@@ -83,6 +89,70 @@ accounts appeared in the same transactions as their mints — on-chain evidence
 rather than documentation. Their bumps are 255, 250 and 254, so the off-curve
 search is genuinely exercised instead of always taking its first candidate.
 
+## Preparing a launch
+
+Three commands, because they carry different risks. `prepare` is arithmetic and
+one read-only simulation; it cannot cost anything. `sign` is the only step that
+reads a key. `send` is the only step that cannot be undone.
+
+```sh
+npm run launch -- prepare --bitstring <01…> --payer <your pubkey> \
+  --name "Quantum Spore" --symbol SPORE --uri https://…/metadata.json \
+  --out launch.json
+
+npm run launch -- sign --in launch.json --bitstring <01…> \
+  --payer-keypair ~/.config/solana/id.json
+
+npm run launch -- send --in launch.signed.json --yes
+```
+
+`prepare` simulates before it writes anything out, so a transaction that the
+program would reject is visible before any key is involved. A simulation that
+fails for want of lamports is reported as a funding problem rather than as a
+broken transaction, because those two look identical on screen and mean
+opposite things.
+
+`sign` reads the fee payer's key from a file, never from an argument or an
+environment variable, and zeroes both secrets when it is done. `send` refuses a
+transaction with a blank signature slot before it opens a socket, and simulates
+once more with signature checking on before it submits.
+
+### Where the instruction layout comes from
+
+pump publishes its own Anchor IDL on chain, in the account Anchor derives from
+the program id with the seed `anchor:idl`. That account is where the
+discriminator, the account names, their order and the argument types in
+`src/launch/pump-create.mjs` come from.
+
+Reading it instead of a guide was not pedantry:
+
+| | discriminator | accounts | token program |
+| --- | --- | --- | --- |
+| `create` — what `sha256("global:create")` gives you | `181ec828051c0777` | 14 | legacy, plus a Metaplex metadata account |
+| `create_v2` — what launches actually send | `d6904cec5f8b31b4` | 16 | Token-2022, no Metaplex account |
+
+Both are in the IDL. In a window of 23 consecutive launches, 23 used
+`create_v2` and none used `create`. A tool built from the instruction's name
+would have produced a transaction the program rejects.
+
+`npm run verify:pump` re-checks that against the chain: it reads the IDL, then
+decodes recent real launches, feeds each one's own inputs back into this
+builder, and requires the instruction to come out byte for byte identical —
+accounts, flags and data. An IDL can go stale, and a builder written from a
+stale IDL agrees with it perfectly while producing transactions that fail; only
+the second check catches that. Eight of eight launches reproduced exactly on the
+last run, including ones that append extra accounts and ones that send a short
+argument buffer.
+
+One account, `mayhem_token_vault`, has no seeds in the IDL. It is derived here
+as the sol vault's token account for the new mint, which is what every sampled
+launch passed.
+
+The whole prepared transaction has also been simulated against mainnet and
+accepted — `err: null`, 94,543 compute units, the logs showing the mint
+initialised, the bonding curve's token account created, metadata written, the
+supply minted and the mint authority handed away.
+
 ## Reading a treasury across chains
 
 ```sh
@@ -128,6 +198,15 @@ looking like a total — so the parts are reported and the total is withheld.
 
 ## Read-only, enforced
 
+The service and the derivation library cannot write. The launch CLI can, in two
+commands and nowhere else.
+
+- `src/launch/broadcast.mjs` is the only file in the repository that can change
+  anything on a chain. It is short on purpose: "this does not send" is then a
+  claim you can check in one screen rather than one you have to trust.
+- `bin/launch.mjs sign` is the only code that reads a key. It takes a file path,
+  wipes the secrets afterwards, and prints no secret at any point.
+- Nothing in the service imports either of them.
 - Both RPC clients carry a method allowlist. A client that forwards any method
   is an open proxy wearing a library's name.
 - `eth_call` is narrowed further to the specific contract the source names.
@@ -150,8 +229,13 @@ looking like a total — so the parts are reported and the total is withheld.
 ## Testing
 
 ```sh
-npm test
+npm test            # offline; the launch builder is pinned to a captured real launch
+npm run verify:pump # against mainnet: the IDL, then recent launches, byte for byte
 ```
+
+`npm test` needs no network. `verify:pump` is the one that can tell you the
+launchpad has changed under this code, so it is the one to run before a launch
+rather than after.
 
 ## License
 
