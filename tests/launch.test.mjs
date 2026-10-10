@@ -177,3 +177,39 @@ test('assertSigned accepts a filled slot and rejects an empty transaction', () =
   const one = Buffer.concat([Buffer.from([1]), Buffer.alloc(64, 7), Buffer.alloc(10, 1)]);
   assert.equal(assertSigned(one.toString('base64')), 1);
 });
+
+// The CLI is where a mistyped argument actually shows up, so its refusals are
+// worth pinning: each one must be a single readable line, must not reach the
+// network, and must exit non-zero.
+test('the CLI refuses bad arguments with one readable line and no network call', async () => {
+  const { spawnSync } = await import('node:child_process');
+  const { fileURLToPath } = await import('node:url');
+  const run = args => {
+    const result = spawnSync(process.execPath, ['bin/launch.mjs', ...args], {
+      // fileURLToPath, not url.pathname: this repository's own path has
+      // non-ASCII characters, which pathname hands back percent-encoded.
+      cwd: fileURLToPath(new URL('..', import.meta.url)),
+      // No network for any of these. A validation failure that still fetched a
+      // blockhash would pass this test while wasting a round trip, so point the
+      // RPC at a closed port: reaching it at all turns into a visible failure.
+      env: { ...process.env, SOLANA_RPC_URL: 'http://127.0.0.1:1' },
+      encoding: 'utf8',
+    });
+    return { status: result.status, output: `${result.stdout}${result.stderr}` };
+  };
+  const good = ['--bitstring', '1001', '--payer', addr(9), '--name', 'n', '--symbol', 's', '--uri', 'https://x/y'];
+
+  for (const [args, expected] of [
+    [['prepare', ...good.with(3, '\u4f60\u7684\u94b1\u5305\u5730\u5740')], /--payer is not a Solana address/],
+    [['prepare', ...good.with(1, '<01\u2026>')], /must be 0s and 1s only/],
+    [['prepare', '--bitstring', '1001', '--payer', '--name'], /--payer looks like the next flag/],
+    [['send', '--in', 'does-not-exist.json'], /No such file/],
+    [['nonsense'], /usage:/],
+  ]) {
+    const { status, output } = run(args);
+    assert.equal(status, 1, `${args.join(' ')} should exit 1, got ${status}: ${output}`);
+    assert.match(output, expected);
+    assert.ok(!/\n\s+at /.test(output), `no stack trace in: ${output}`);
+    assert.ok(!/ECONNREFUSED|127\.0\.0\.1:1/.test(output), `must not have reached the network: ${output}`);
+  }
+});

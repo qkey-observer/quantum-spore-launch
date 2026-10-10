@@ -106,6 +106,11 @@ npm run launch -- sign --in launch.json --bitstring <01…> \
 npm run launch -- send --in launch.signed.json --yes
 ```
 
+`<bits>` is the measured bitstring itself, 0s and 1s; `--payer` is a base58
+address. Arguments are checked before anything touches the network, so a
+placeholder left in by accident costs one line of output rather than a stack
+trace halfway through a round trip.
+
 `prepare` simulates before it writes anything out, so a transaction that the
 program would reject is visible before any key is involved. A simulation that
 fails for want of lamports is reported as a funding problem rather than as a
