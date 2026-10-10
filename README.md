@@ -43,6 +43,46 @@ Correctness here is not self-assessed:
 `@solana/web3.js` is not a dependency. The derivation is built on
 `@noble/curves` and `@noble/hashes` and nothing else.
 
+## pump.fun: the mint is a keypair, so the order matters
+
+A pump.fun mint is not a PDA. It is an ordinary ed25519 keypair — which is why
+those addresses can end in `pump` at all, since vanity suffixes come from
+grinding keys, not from deriving addresses. Deriving the mint from a bitstring
+therefore works like this:
+
+```
+seed = sha256(utf8(bitstring))  →  ed25519 keypair  →  public key = the mint
+bonding curve = PDA(["bonding-curve", mint], 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P)
+```
+
+```sh
+npm run derive -- --bitstring 1001001000010000000100000000000000000000000000000000000000000000 --pump
+```
+
+**The consequence is the whole reason to read this section: on this launchpad
+the bitstring *is* the mint's private key.** Anyone who has it can recompute the
+key and mint, so publishing a measurement before the launch hands away control
+of the token. The commitment still works, in one order only:
+
+1. measure,
+2. publish the **address**,
+3. launch,
+4. publish the bitstring.
+
+Step 4 is what makes step 2 checkable, and by then the key no longer controls
+anything — pump.fun's mint authority is the bonding curve, not the keypair. That
+sequence is a security property here, not a presentation choice, so this library
+splits the two paths apart: `mintAddressFromBitstring` returns an address and
+cannot leak a key, `mintKeypairFromBitstring` returns the secret and says in its
+own return value what holding it means. The `--pump` CLI prints the address
+only; a flag that printed the key would put it in a shell history every time
+someone asked where the token would live.
+
+The curve seeds are checked against three real pump.fun launches, whose curve
+accounts appeared in the same transactions as their mints — on-chain evidence
+rather than documentation. Their bumps are 255, 250 and 254, so the off-curve
+search is genuinely exercised instead of always taking its first candidate.
+
 ## Reading a treasury across chains
 
 ```sh
