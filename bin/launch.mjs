@@ -14,6 +14,8 @@ import { base58Decode, base58Encode } from '../src/derive/index.mjs';
 import { mintAddressFromBitstring, mintKeypairFromBitstring, bondingCurveFor } from '../src/derive/pump.mjs';
 import { buildLaunchTransaction } from '../src/launch/pump-create.mjs';
 import { assertSigned, DEFAULT_RPC, latestBlockhash, send, simulate } from '../src/launch/broadcast.mjs';
+import { createSolanaClient, GENESIS_HASHES } from '../src/chains/solana.mjs';
+import { PROGRAMS } from '../src/launch/pump-create.mjs';
 
 const argv = process.argv.slice(2);
 const command = argv[0];
@@ -31,6 +33,7 @@ usage:
                  [--holder-reward] [--out <file.json>] [--no-simulate] [--rpc <url>]
   launch sign    --in <file.json> --bitstring <bits> --payer-keypair <path.json> [--out <file.json>]
   launch send    --in <file.json> --yes [--rpc <url>]
+  launch verify  --bitstring <bits> [--mint <pubkey>] [--onchain] [--rpc <url>]
 
 <bits> is the measured bitstring, e.g. 10010010000100000001…  (0s and 1s only)
 <pubkey> is a base58 Solana address, e.g. 7BqXuedSVx3fETcDsvmZPqTw4dEvtPGhkHwhc5yMD6st
@@ -170,7 +173,62 @@ async function sendCommand() {
   console.log(`sent ${signature}\n${explorer}`);
 }
 
-const COMMANDS = { prepare, sign, send: sendCommand };
+/**
+ * Check a published commitment, from the outside.
+ *
+ * This is the command a sceptic runs, so it takes only public values and needs
+ * nothing from whoever made the claim: a bitstring and the address that was
+ * published before the launch. It recomputes the address and, with --onchain,
+ * confirms that the token at that address exists and is what it should be.
+ *
+ * What it establishes is narrow and worth stating exactly: that the bitstring
+ * published after the launch is the one the address was derived from, so the
+ * address was fixed before the launch rather than chosen to fit it afterwards.
+ * It says nothing about where the bitstring came from. No tool can — a
+ * measurement's provenance is not a property of its result.
+ */
+async function verify() {
+  const bitstring = requireBitstring(flag('bitstring'));
+  const claimed = flag('mint') ? requireAddress(flag('mint'), '--mint') : null;
+  const mint = mintAddressFromBitstring(bitstring);
+  const curve = bondingCurveFor(mint);
+
+  console.log(`bitstring     ${bitstring.length} bits`);
+  console.log(`derived mint  ${mint}`);
+  console.log(`bonding curve ${curve.address}  bump ${curve.bump}`);
+
+  let failed = false;
+  if (claimed) {
+    const match = claimed === mint;
+    failed ||= !match;
+    console.log(`\n${match ? 'MATCH' : 'MISMATCH'}        the published address ${match ? 'is' : 'is not'} what this bitstring derives`);
+    if (!match) console.log(`  published   ${claimed}\n  derived     ${mint}`);
+  }
+
+  if (has('onchain')) {
+    const call = createSolanaClient({ rpcUrl: rpc });
+    const genesis = await call('getGenesisHash');
+    const cluster = Object.entries(GENESIS_HASHES).find(([, hash]) => hash === genesis)?.[0] ?? 'an unknown cluster';
+    console.log(`\ncluster       ${cluster}`);
+    if (cluster !== 'mainnet-beta') console.log('  (not mainnet — a token existing here proves nothing about mainnet)');
+
+    for (const [label, address, expectedOwner, ownerName] of [
+      ['mint', mint, PROGRAMS.token2022, 'Token-2022'],
+      ['curve', curve.address, PROGRAMS.pump, 'the pump program'],
+    ]) {
+      const info = await call('getAccountInfo', [address, { encoding: 'base64' }]);
+      if (!info?.value) { failed = true; console.log(`  ✗ ${label} ${address} does not exist on this cluster`); continue; }
+      const right = info.value.owner === expectedOwner;
+      failed ||= !right;
+      console.log(`  ${right ? '✓' : '✗'} ${label} exists, owned by ${right ? ownerName : info.value.owner}`);
+    }
+  }
+
+  if (failed) die('\nThe commitment does not check out.');
+  console.log(claimed || has('onchain') ? '\nChecks out. Note what this does and does not show: the address was fixed by this\nbitstring before the launch. Where the bitstring came from is a separate claim,\nand no command can settle it.' : '');
+}
+
+const COMMANDS = { prepare, sign, send: sendCommand, verify };
 try {
   const run = COMMANDS[command];
   if (!run) die(USAGE);

@@ -213,3 +213,28 @@ test('the CLI refuses bad arguments with one readable line and no network call',
     assert.ok(!/ECONNREFUSED|127\.0\.0\.1:1/.test(output), `must not have reached the network: ${output}`);
   }
 });
+
+// `verify` is the command an outsider runs, so its two outcomes are the ones
+// that must never be ambiguous: a mismatch has to exit non-zero.
+test('verify matches a published address against a bitstring, and fails loudly when it does not', async () => {
+  const { spawnSync } = await import('node:child_process');
+  const { fileURLToPath } = await import('node:url');
+  const bits = '1001001000010000000100000000000000000000000000000000000000000000';
+  const run = args => spawnSync(process.execPath, ['bin/launch.mjs', 'verify', ...args], {
+    cwd: fileURLToPath(new URL('..', import.meta.url)),
+    env: { ...process.env, SOLANA_RPC_URL: 'http://127.0.0.1:1' },
+    encoding: 'utf8',
+  });
+
+  const ok = run(['--bitstring', bits, '--mint', 'AruKhDcqVmq4g4xMnCMx1YJXprZsWuJm1tVeWNeY4JGn']);
+  assert.equal(ok.status, 0);
+  assert.match(ok.stdout, /MATCH/);
+  // The claim it does not make has to be on screen too, or a reader takes the
+  // match for more than it is.
+  assert.match(ok.stdout, /Where the bitstring came from is a separate claim/);
+
+  const bad = run(['--bitstring', bits, '--mint', '896UhWBoT3wBmvL2mjNg7K1sE8rFoC5T6pgHrCRJw7M9']);
+  assert.equal(bad.status, 1, 'a mismatch must exit non-zero');
+  assert.match(bad.stdout, /MISMATCH/);
+  assert.match(`${bad.stdout}${bad.stderr}`, /does not check out/);
+});

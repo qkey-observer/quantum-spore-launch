@@ -1,4 +1,4 @@
-# quantum-spore-service
+# quantum-spore-launch
 
 Tooling for a launch whose address is fixed by a quantum measurement rather than
 chosen:
@@ -13,6 +13,44 @@ The service in `src/server.mjs` has no write path — not disabled behind a flag
 absent — and no keys. The launch CLI is where signing and sending live, as two
 separate commands that nothing else calls. [Read-only, enforced](#read-only-enforced)
 says exactly which guarantee covers which part.
+
+## Check it rather than trust it
+
+Nothing here asks to be taken on someone's word. Three commands, no credentials,
+no account:
+
+```sh
+npm ci && npm test       # derivations against EIP-1014's own vectors and @solana/web3.js
+npm run verify:pump      # against mainnet: pump's on-chain IDL, then real launches, byte for byte
+npm run launch -- verify --bitstring <bits> --mint <published address> --onchain
+```
+
+The last one is the one that matters to an outsider. Give it a bitstring
+published after a launch and the address published before it, and it recomputes
+the address from the bitstring — so a claim that the address was fixed by the
+measurement can be checked by anyone, against nobody's assurance.
+
+## What this cannot prove
+
+Worth stating before anything else, because the gap is real and a reader will
+find it anyway.
+
+**This code proves that the machinery is real, not that a measurement happened.**
+It can show that an address follows from a bitstring by arithmetic anyone can
+repeat, and that the launch transaction it builds is the one the live program
+accepts. Where the bitstring came from is a different kind of claim, and no
+command in this repository settles it. IBM job results are scoped to the account
+that ran them, so a third party holding a job id cannot fetch the result and
+check it — that link cannot be made independently verifiable, and saying
+otherwise would be the one lie that discredits everything else here.
+
+What *is* verifiable is the ordering. Publish the address, launch, then publish
+the bitstring: `verify` confirms the two correspond, which establishes that the
+address was fixed in advance rather than chosen afterwards to fit. That is a
+commitment, not a provenance proof, and the difference matters.
+
+Also: an address appearing in a config file is not evidence that anyone owns or
+controls it, and detecting that an address holds code is not an audit.
 
 ## Why a bitstring can fix an address
 
@@ -238,9 +276,11 @@ npm test            # offline; the launch builder is pinned to a captured real l
 npm run verify:pump # against mainnet: the IDL, then recent launches, byte for byte
 ```
 
-`npm test` needs no network. `verify:pump` is the one that can tell you the
-launchpad has changed under this code, so it is the one to run before a launch
-rather than after.
+`npm test` needs no network and runs in CI on every push. `verify:pump` is the
+one that can tell you the launchpad has changed under this code, so it is the
+one to run before a launch rather than after — it is deliberately not in CI,
+because a check that fails when a public RPC rate-limits teaches a reader to
+ignore it.
 
 ## License
 
