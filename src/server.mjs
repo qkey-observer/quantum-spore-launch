@@ -74,3 +74,49 @@ export function createHttpServer(api, { allowedHosts = null } = {}) {
     }
   });
 }
+
+// Running the file starts the service. Without this the package's own start
+// script loaded a module full of exports and exited, which is worse than an
+// error: the command the README opens with appeared to work and served
+// nothing.
+if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+  const { existsSync } = await import('node:fs');
+  const { fileURLToPath } = await import('node:url');
+  const { dirname, resolve } = await import('node:path');
+
+  const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+  const fromArgv = process.argv[2] ?? process.env.SPORE_CONFIG ?? null;
+  // A local config wins, then the checked-in example, so a fresh clone runs.
+  const candidates = [fromArgv, resolve(root, 'config/local.json'), resolve(root, 'config/example.json')].filter(Boolean);
+  const path = candidates.find(candidate => existsSync(candidate));
+  if (!path) {
+    console.error('No configuration found. Pass one as an argument, or copy config/example.json to config/local.json.');
+    process.exit(1);
+  }
+
+  let config;
+  try {
+    config = loadConfig(path);
+  } catch (error) {
+    console.error(`Configuration at ${path} was refused: ${error.message}`);
+    process.exit(1);
+  }
+
+  const port = Number(process.env.PORT ?? 8787);
+  const host = process.env.HOST ?? '127.0.0.1';
+  // Loopback by default. A service that binds every interface the moment it
+  // starts is one misconfigured firewall away from being someone else's.
+  const allowedHosts = process.env.ALLOWED_HOSTS
+    ? process.env.ALLOWED_HOSTS.split(',').map(entry => entry.trim().toLowerCase())
+    : null;
+
+  const server = createHttpServer(createApi(config), { allowedHosts });
+  server.listen(port, host, () => {
+    console.log(`quantum-spore-service listening on ${host}:${port}`);
+    console.log(`  config   ${path}`);
+    console.log(`  sources  ${config.sources.map(source => `${source.id} (${source.kind})`).join(', ')}`);
+    console.log('  routes   GET /health, GET /treasury, GET /derivations');
+    console.log('  read-only: this process has no write path and holds no keys.');
+  });
+  for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => server.close(() => process.exit(0)));
+}

@@ -46,11 +46,28 @@ Correctness here is not self-assessed:
 ## Reading a treasury across chains
 
 ```sh
-cp config/example.json config/local.json   # edit holders, RPCs and assets
-npm start
+npm start                                  # runs on config/example.json
 ```
 
-`GET /treasury` returns every source and, when it can, their total.
+That works on a fresh clone, against the example configuration. For your own
+holders, RPCs and assets:
+
+```sh
+cp config/example.json config/local.json   # config/local.json is gitignored
+npm start                                  # local.json is preferred when present
+npm start -- /path/to/other.json           # or name one directly
+```
+
+`PORT` (default 8787), `HOST` (default 127.0.0.1) and `ALLOWED_HOSTS` are read
+from the environment. It binds loopback unless told otherwise: a service that
+listens on every interface the moment it starts is one misconfigured firewall
+away from being someone else's.
+
+| Route | Returns |
+| --- | --- |
+| `GET /health` | liveness, and that this process is read-only |
+| `GET /treasury` | every source and, when it can, their total |
+| `GET /derivations` | the addresses the configured bitstring fixes |
 
 Three outcomes, kept distinct on purpose:
 
