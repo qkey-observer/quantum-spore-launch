@@ -1,0 +1,35 @@
+{
+  "_readme": [
+    "Every field here is public. This service holds no keys and has no write path,",
+    "so there is nothing in this file that needs protecting — if a value looks like",
+    "a secret, it is in the wrong file and loadConfig refuses it.",
+    "Sources are summed only when they agree on decimals; otherwise the parts are",
+    "reported without a total, because adding different units produces a number",
+    "that means nothing."
+  ],
+  "sources": [
+    {
+      "id": "evm-native",
+      "kind": "evm",
+      "chainId": 56,
+      "rpcUrl": "https://bsc-dataseed.binance.org",
+      "holder": "0x0000000000000000000000000000000000000000",
+      "token": null,
+      "symbol": "BNB",
+      "decimals": 18
+    },
+    {
+      "id": "solana-spl",
+      "kind": "solana",
+      "rpcUrl": "https://api.mainnet-beta.solana.com",
+      "cluster": "mainnet-beta",
+      "holder": "11111111111111111111111111111111",
+      "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "symbol": "USDC"
+    }
+  ],
+  "exampleBitstring": null,
+  "derivationTargets": [
+    { "kind": "solana", "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" }
+  ]
+}
