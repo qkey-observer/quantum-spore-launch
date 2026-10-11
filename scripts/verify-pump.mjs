@@ -19,6 +19,10 @@ import { createSolanaClient } from '../src/chains/solana.mjs';
 
 const RPC = process.env.SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com';
 const SAMPLES = Number(process.env.SAMPLES ?? 6);
+// Sampled separately from the creates: a quarter of launches carry no buy at
+// all, so a window of a few launches can hold none, and "none found" would then
+// read as a failure of the builder rather than of the window.
+const BUY_SAMPLES = Number(process.env.BUY_SAMPLES ?? 2);
 // Touched by create and create_v2 and by nothing else, so its signature history
 // is a list of launches rather than of trades.
 const MINT_AUTHORITY = findProgramAddress([new TextEncoder().encode('mint-authority')], PROGRAMS.pump).address;
@@ -77,18 +81,31 @@ if (!idlAccount?.value) {
 }
 
 console.log(`\nReal launches, via the mint authority's history (${MINT_AUTHORITY})`);
-const signatures = await rpc('getSignaturesForAddress', [MINT_AUTHORITY, { limit: Math.max(SAMPLES * 3, 12) }]);
+const signatures = await rpc('getSignaturesForAddress', [MINT_AUTHORITY, { limit: Math.max(SAMPLES * 4, 60) }]);
 let checked = 0;
 let buysChecked = 0;
 let legacyCreate = 0;
 for (const entry of signatures) {
-  if (checked >= SAMPLES) break;
+  if (checked >= SAMPLES && buysChecked >= BUY_SAMPLES) break;
   if (entry.err) continue;
   const tx = await rpc('getTransaction', [entry.signature, { encoding: 'json', maxSupportedTransactionVersion: 1 }]);
   if (!tx) continue;
   const message = tx.transaction.message;
   const loaded = tx.meta.loadedAddresses ?? { writable: [], readonly: [] };
   const keys = [...message.accountKeys, ...loaded.writable, ...loaded.readonly];
+  // The creator a buy pays its creator fee to is the create's `creator`
+  // argument, not necessarily the buyer — launches do separate the two. So it
+  // is read from the create in the same transaction before any buy is checked.
+  let launchCreator = null;
+  for (const ix of message.instructions) {
+    if (keys[ix.programIdIndex] !== PROGRAMS.pump) continue;
+    const data = base58Decode(ix.data);
+    if (hex(data.slice(0, 8)) !== hex(CREATE_V2_DISCRIMINATOR)) continue;
+    const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
+    let offset = 8;
+    for (let field = 0; field < 3; field++) offset += 4 + view.getUint32(offset, true);
+    launchCreator = base58Encode(data.slice(offset, offset + 32));
+  }
   for (const ix of message.instructions) {
     if (keys[ix.programIdIndex] !== PROGRAMS.pump) continue;
     const data = base58Decode(ix.data);
@@ -96,16 +113,19 @@ for (const entry of signatures) {
     // derived from the mint and the user except for the two fee recipients,
     // which the launch chose from pools — those are fed back in as inputs.
     if (hex(data.slice(0, 8)) === hex(BUY_V2_DISCRIMINATOR)) {
+      if (buysChecked >= BUY_SAMPLES || !launchCreator) continue;
       const sent = ix.accounts.map(n => keys[n]);
       if (sent.length < 27) continue;
+      const separate = launchCreator !== sent[13];
+      console.log(`  ${entry.signature.slice(0, 12)}…  buy_v2 bundled with the create${separate ? '  (creator is not the buyer)' : ''}`);
       const derived = buyV2Accounts({
-        mint: sent[1], user: sent[13], creator: sent[13],
+        mint: sent[1], user: sent[13], creator: launchCreator,
         feeRecipient: sent[6], buybackFeeRecipient: sent[8],
       }).map(a => a.pubkey);
       const same = derived.join(',') === sent.slice(0, 27).join(',');
       report(same, `    buy_v2: its ${derived.length} accounts reproduced in order`);
       const rebuilt = buildBuyV2({
-        mint: sent[1], user: sent[13], creator: sent[13],
+        mint: sent[1], user: sent[13], creator: launchCreator,
         feeRecipient: sent[6], buybackFeeRecipient: sent[8],
         amount: new DataView(data.buffer, data.byteOffset + 8, 8).getBigUint64(0, true),
         maxSolCost: new DataView(data.buffer, data.byteOffset + 16, 8).getBigUint64(0, true),
@@ -115,7 +135,7 @@ for (const entry of signatures) {
       continue;
     }
     if (hex(data.slice(0, 8)) !== hex(CREATE_V2_DISCRIMINATOR)) { if (data.length > 8) legacyCreate++; continue; }
-    if (checked >= SAMPLES) break;
+    if (checked >= SAMPLES) continue;
     checked++;
 
     const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
@@ -159,7 +179,9 @@ for (const entry of signatures) {
   }
 }
 report(checked > 0, `found ${checked} create_v2 launch${checked === 1 ? '' : 'es'} to check against`);
-report(buysChecked > 0, `found ${buysChecked} bundled dev buy${buysChecked === 1 ? '' : 's'} to check against`);
+// Across 60 launches, finding no buy_v2 at all would itself be news: it would
+// mean launches have moved to another instruction, and this builder with them.
+report(buysChecked > 0, `found ${buysChecked} bundled buy_v2${buysChecked === 1 ? '' : 's'} to check against${buysChecked ? '' : ' in the last 60 launches — have launches moved to another buy instruction?'}`);
 
 console.log('\nThe launchpad state a dev buy needs');
 try {
