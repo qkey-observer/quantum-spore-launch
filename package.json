@@ -1,10 +1,10 @@
 {
   "name": "quantum-spore-launch",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
   "license": "MIT",
   "type": "module",
-  "description": "Derive the address a measured bitstring fixes, read balances across EVM chains and Solana, and prepare a pump.fun launch at that address. The service holds no keys and cannot write; signing and sending are two separate CLI commands.",
+  "description": "Fix a token launch address with a quantum measurement: derive it (CREATE2, Solana PDAs, pump.fun mints), prepare the pump.fun launch with an optional bundled dev buy, and let anyone verify the commitment afterwards. The read-only service holds no keys; signing and sending are two separate CLI commands.",
   "engines": {
     "node": ">=20"
   },
