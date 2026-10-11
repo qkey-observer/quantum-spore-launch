@@ -15,6 +15,7 @@ import { mintAddressFromBitstring, mintKeypairFromBitstring, bondingCurveFor } f
 import { buildLaunchTransaction } from '../src/launch/pump-create.mjs';
 import { assertSigned, DEFAULT_RPC, latestBlockhash, send, simulate } from '../src/launch/broadcast.mjs';
 import { createSolanaClient, GENESIS_HASHES } from '../src/chains/solana.mjs';
+import { defaultRecipients, devBuyInstructions, LAUNCH_LOOKUP_TABLE, quoteTokensForLamports, readGlobalState, readLookupTable } from '../src/launch/pump-buy.mjs';
 import { PROGRAMS } from '../src/launch/pump-create.mjs';
 
 const argv = process.argv.slice(2);
@@ -29,14 +30,17 @@ const die = message => { throw new Refused(message); };
 const USAGE = `
 usage:
   launch prepare --bitstring <bits> --payer <pubkey> --name <n> --symbol <s> --uri <url>
-                 [--creator <pubkey>] [--creator-fee-bps <n>] [--mayhem] [--cashback]
-                 [--holder-reward] [--out <file.json>] [--no-simulate] [--rpc <url>]
+                 [--buy <SOL>] [--creator <pubkey>] [--creator-fee-bps <n>] [--mayhem]
+                 [--cashback] [--holder-reward] [--out <file.json>] [--no-simulate] [--rpc <url>]
   launch sign    --in <file.json> --bitstring <bits> --payer-keypair <path.json> [--out <file.json>]
   launch send    --in <file.json> --yes [--rpc <url>]
   launch verify  --bitstring <bits> [--mint <pubkey>] [--onchain] [--rpc <url>]
 
 <bits> is the measured bitstring, e.g. 10010010000100000001…  (0s and 1s only)
 <pubkey> is a base58 Solana address, e.g. 7BqXuedSVx3fETcDsvmZPqTw4dEvtPGhkHwhc5yMD6st
+
+--buy adds the dev buy to the same transaction. Without it the first buy of the
+token is open to whoever is watching, and the creator holds none of it.
 
 The mint is derived from the bitstring, which means the bitstring is the mint's
 private key. Publish the address before the launch and the bitstring after it.
@@ -78,15 +82,38 @@ async function prepare() {
   const feeBps = Number(flag('creator-fee-bps') ?? 0);
   if (!Number.isInteger(feeBps) || feeBps < 0) die(`--creator-fee-bps must be a whole number, not ${flag('creator-fee-bps')}.`);
 
+  const buySol = flag('buy');
+  if (buySol !== null && !(Number(buySol) > 0)) die(`--buy takes an amount of SOL greater than 0, not ${buySol}.`);
   const mint = mintAddressFromBitstring(bitstring);
   const curve = bondingCurveFor(mint);
   // Only now is the network touched: everything above can fail for free.
   const blockhash = has('no-simulate') ? base58Encode(new Uint8Array(32)) : (await latestBlockhash(rpc)).blockhash;
+
+  // The dev buy needs the launchpad's fee recipient pools and starting
+  // reserves, which are state rather than arithmetic — one account read.
+  let devBuy = null;
+  let lookupTables = [];
+  if (buySol !== null) {
+    const call = createSolanaClient({ rpcUrl: rpc });
+    const table = await readLookupTable(call, flag('lookup-table') ?? LAUNCH_LOOKUP_TABLE);
+    lookupTables = [table];
+    const global = await readGlobalState(call);
+    const lamports = BigInt(Math.round(Number(buySol) * 1e9));
+    const quote = quoteTokensForLamports(lamports, global);
+    const recipients = defaultRecipients(global);
+    devBuy = {
+      instructions: devBuyInstructions({ mint, user: payer, creator, amount: quote.amount, maxSolCost: quote.maxSolCost, ...recipients, global }),
+      quote, lamports,
+    };
+  }
+
   const tx = buildLaunchTransaction({
     mint, user: payer, name, symbol, uri, creator,
     creatorFeeBps: feeBps,
     isMayhemMode: has('mayhem'), isCashbackEnabled: has('cashback'), isHolderReward: has('holder-reward'),
     recentBlockhash: blockhash,
+    also: devBuy ? devBuy.instructions : [],
+    lookupTables,
   });
 
   console.log(`mint          ${mint}`);
@@ -94,6 +121,14 @@ async function prepare() {
   console.log(`payer         ${payer}`);
   console.log(`signatures    ${tx.signatureSlots.length} required, 0 present`);
   console.log(`blockhash     ${blockhash}${has('no-simulate') ? ' (placeholder — fetch a real one before signing)' : ''}`);
+  if (devBuy) {
+    const tokens = Number(devBuy.quote.amount) / 1e6;
+    console.log(`dev buy       ${Number(devBuy.lamports) / 1e9} SOL cap → ${tokens.toLocaleString('en-US', { maximumFractionDigits: 0 })} tokens`);
+    console.log(`              ${Number(devBuy.quote.feeBasisPoints) / 100}% launchpad fee, asking 1% under the budget so slippage cannot revert the launch`);
+    console.log(`version       0, ${tx.message.length} byte message, ${lookupTables[0].addresses.length} addresses available in the lookup table`);
+  } else {
+    console.log('dev buy       none — the first buy of this token is open to anyone watching');
+  }
 
   if (!has('no-simulate')) {
     const result = await simulate(tx.transactionBase64, { rpc });

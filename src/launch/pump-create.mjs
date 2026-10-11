@@ -16,7 +16,7 @@
 // accounts, Token-2022, no Metaplex account, four extra arguments. A tool built
 // from the name alone would have produced a transaction that fails.
 import { findProgramAddress } from '../derive/index.mjs';
-import { addressOf, base58Encode, compileMessage, encodeString, encodeU64, SYSTEM_PROGRAM, unsignedTransaction } from './solana-tx.mjs';
+import { addressOf, base58Encode, compileMessage, compileV0Message, encodeString, encodeU64, SYSTEM_PROGRAM, unsignedTransaction } from './solana-tx.mjs';
 import { bondingCurveFor, PUMP_PROGRAM_ID } from '../derive/pump.mjs';
 
 export const CREATE_V2_DISCRIMINATOR = Uint8Array.of(0xd6, 0x90, 0x4c, 0xec, 0x5f, 0x8b, 0x31, 0xb4);
@@ -106,13 +106,21 @@ export function buildCreateV2({
  * launchpad means the bitstring. Signing happens wherever those keys are, and
  * that is deliberately not this process.
  */
-export function buildLaunchTransaction({ recentBlockhash, ...args }) {
+export function buildLaunchTransaction({ recentBlockhash, also = [], lookupTables = [], ...args }) {
   if (!recentBlockhash) throw new Error('A transaction needs a recent blockhash; it expires in about a minute.');
   const instruction = buildCreateV2(args);
-  const message = compileMessage({ payer: args.user, instructions: [instruction], recentBlockhash });
+  // `also` is for the dev buy. It rides in the same transaction on purpose:
+  // split across two, the gap between them is the window in which somebody
+  // else takes the first buy. That bundle does not fit in a legacy message, so
+  // with a table available it compiles as version 0 instead.
+  const instructions = [instruction, ...also];
+  const message = lookupTables.length
+    ? compileV0Message({ payer: args.user, instructions, recentBlockhash, lookupTables })
+    : compileMessage({ payer: args.user, instructions, recentBlockhash });
   return {
     ...unsignedTransaction(message),
     instruction,
+    instructions: [instruction, ...also],
     accounts: message.accounts,
     mint: typeof args.mint === 'string' ? args.mint : base58Encode(args.mint),
     warning: 'Unsigned. The mint signature comes from the bitstring, so anyone who has the bitstring before this lands can launch it themselves.',

@@ -14,6 +14,8 @@
 import zlib from 'node:zlib';
 import { findProgramAddress, base58Decode, base58Encode } from '../src/derive/index.mjs';
 import { buildCreateV2, CREATE_V2_DISCRIMINATOR, IDL_ACCOUNT, PROGRAMS } from '../src/launch/pump-create.mjs';
+import { buildBuyV2, buyV2Accounts, BUY_V2_DISCRIMINATOR, readGlobalState, readLookupTable } from '../src/launch/pump-buy.mjs';
+import { createSolanaClient } from '../src/chains/solana.mjs';
 
 const RPC = process.env.SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com';
 const SAMPLES = Number(process.env.SAMPLES ?? 6);
@@ -77,6 +79,7 @@ if (!idlAccount?.value) {
 console.log(`\nReal launches, via the mint authority's history (${MINT_AUTHORITY})`);
 const signatures = await rpc('getSignaturesForAddress', [MINT_AUTHORITY, { limit: Math.max(SAMPLES * 3, 12) }]);
 let checked = 0;
+let buysChecked = 0;
 let legacyCreate = 0;
 for (const entry of signatures) {
   if (checked >= SAMPLES) break;
@@ -89,6 +92,28 @@ for (const entry of signatures) {
   for (const ix of message.instructions) {
     if (keys[ix.programIdIndex] !== PROGRAMS.pump) continue;
     const data = base58Decode(ix.data);
+    // The dev buy that rides along in the same transaction. Its accounts are
+    // derived from the mint and the user except for the two fee recipients,
+    // which the launch chose from pools — those are fed back in as inputs.
+    if (hex(data.slice(0, 8)) === hex(BUY_V2_DISCRIMINATOR)) {
+      const sent = ix.accounts.map(n => keys[n]);
+      if (sent.length < 27) continue;
+      const derived = buyV2Accounts({
+        mint: sent[1], user: sent[13], creator: sent[13],
+        feeRecipient: sent[6], buybackFeeRecipient: sent[8],
+      }).map(a => a.pubkey);
+      const same = derived.join(',') === sent.slice(0, 27).join(',');
+      report(same, `    buy_v2: its ${derived.length} accounts reproduced in order`);
+      const rebuilt = buildBuyV2({
+        mint: sent[1], user: sent[13], creator: sent[13],
+        feeRecipient: sent[6], buybackFeeRecipient: sent[8],
+        amount: new DataView(data.buffer, data.byteOffset + 8, 8).getBigUint64(0, true),
+        maxSolCost: new DataView(data.buffer, data.byteOffset + 16, 8).getBigUint64(0, true),
+      });
+      report(hex(rebuilt.data) === hex(data), '    buy_v2: instruction data reproduced byte for byte');
+      buysChecked++;
+      continue;
+    }
     if (hex(data.slice(0, 8)) !== hex(CREATE_V2_DISCRIMINATOR)) { if (data.length > 8) legacyCreate++; continue; }
     if (checked >= SAMPLES) break;
     checked++;
@@ -134,6 +159,23 @@ for (const entry of signatures) {
   }
 }
 report(checked > 0, `found ${checked} create_v2 launch${checked === 1 ? '' : 'es'} to check against`);
+report(buysChecked > 0, `found ${buysChecked} bundled dev buy${buysChecked === 1 ? '' : 's'} to check against`);
+
+console.log('\nThe launchpad state a dev buy needs');
+try {
+  const call = createSolanaClient({ rpcUrl: RPC });
+  const global = await readGlobalState(call);
+  report(global.feeRecipients.length === 7, `${global.feeRecipients.length} fee recipients in the pool`);
+  report(global.buybackFeeRecipients.length === 8, `${global.buybackFeeRecipients.length} buyback fee recipients in the pool`);
+  report(global.feeBasisPoints + global.creatorFeeBasisPoints > 0n, `fees ${global.feeBasisPoints}+${global.creatorFeeBasisPoints} basis points`);
+  report(global.initialVirtualSolReserves > 0n && global.initialVirtualTokenReserves > 0n, 'the curve publishes its starting reserves');
+  const table = await readLookupTable(call);
+  // Without this table a create and a buy do not fit in one transaction, so a
+  // table that has shrunk or moved is worth knowing about before a launch.
+  report(table.addresses.length > 0, `the launch lookup table holds ${table.addresses.length} addresses`);
+} catch (error) {
+  report(false, `could not read the launchpad state: ${error.message}`);
+}
 if (legacyCreate) console.log(`  (${legacyCreate} launch${legacyCreate === 1 ? '' : 'es'} in this window used a different pump instruction)`);
 
 console.log(problems.length ? `\n${problems.length} problem(s)\n` : '\nEverything checked out.\n');

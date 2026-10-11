@@ -136,7 +136,7 @@ reads a key. `send` is the only step that cannot be undone.
 ```sh
 npm run launch -- prepare --bitstring <01…> --payer <your pubkey> \
   --name "Quantum Spore" --symbol SPORE --uri https://…/metadata.json \
-  --out launch.json
+  --buy 0.5 --out launch.json
 
 npm run launch -- sign --in launch.json --bitstring <01…> \
   --payer-keypair ~/.config/solana/id.json
@@ -148,6 +148,9 @@ npm run launch -- send --in launch.signed.json --yes
 address. Arguments are checked before anything touches the network, so a
 placeholder left in by accident costs one line of output rather than a stack
 trace halfway through a round trip.
+
+`--buy` is optional and worth thinking about rather than skipping: see
+[the dev buy](#the-dev-buy-and-why-it-shares-the-transaction).
 
 `prepare` simulates before it writes anything out, so a transaction that the
 program would reject is visible before any key is involved. A simulation that
@@ -190,6 +193,45 @@ argument buffer.
 One account, `mayhem_token_vault`, has no seeds in the IDL. It is derived here
 as the sol vault's token account for the new mint, which is what every sampled
 launch passed.
+
+### The dev buy, and why it shares the transaction
+
+`--buy <SOL>` adds pump's `buy_v2` to the same transaction as the create. Every
+launch sampled on chain bundled one, and the reason is plain: a create on its
+own leaves the first buy of the token to whoever is watching, and the creator
+holding none of it.
+
+Two of `buy_v2`'s 27 accounts cannot be derived. `fee_recipient` and
+`buyback_fee_recipient` are chosen from pools the program keeps in its `Global`
+account — seven and eight of them — and the IDL gives them no seeds. So this
+reads `Global` rather than guessing, and checks the chosen pair against those
+pools before building: a recipient the program does not recognise fails the
+whole transaction, and at a launch that failure arrives too late to act on. The
+other 25 follow from the mint and the buyer.
+
+The amount is a deliberate under-estimate. `buy_v2` takes a token amount and a
+spending cap and prices the tokens itself, so asking for more than the cap
+covers reverts everything. This asks for about 1% fewer tokens than the budget
+affords and sets the cap at the budget exactly — a reverted launch cannot be
+retried at the same moment, while the cap means the shortfall can never become
+an overspend. Fees (0.95% platform plus 0.05% creator, read from `Global`) come
+off before the curve.
+
+Two things had to be learned from the chain rather than reasoned out:
+
+- **A create and a buy do not fit in one legacy transaction.** Together they
+  name more accounts than 1232 bytes can hold. Real launches are version 0
+  transactions using one address lookup table, so this compiles version 0 the
+  same way, and the message drops from about 1400 bytes to under 800. Signers
+  and the program id of a top-level instruction stay in the static list;
+  everything the table contains moves into it.
+- **`buy_v2` does not create the buyer's token account for the new mint.** It
+  requires it. Simulation says so in as many words — `AnchorError caused by
+  account: associated_base_user. AccountNotInitialized` — so an idempotent
+  account creation sits between the create and the buy.
+
+The bundled transaction has been simulated against mainnet and accepted:
+`err: null`, 204,837 compute units, both instructions succeeding.
 
 The whole prepared transaction has also been simulated against mainnet and
 accepted — `err: null`, 94,543 compute units, the logs showing the mint
