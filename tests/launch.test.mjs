@@ -238,3 +238,46 @@ test('verify matches a published address against a bitstring, and fails loudly w
   assert.match(bad.stdout, /MISMATCH/);
   assert.match(`${bad.stdout}${bad.stderr}`, /does not check out/);
 });
+
+// The node behind --rpc is identified before anything is prepared on it. A
+// devnet node answering a mainnet launch would otherwise produce a transaction
+// that is valid, simulates cleanly and signs — on the wrong network.
+test('prepare refuses a node on the wrong cluster, and asks it nothing else', async () => {
+  const { createServer } = await import('node:http');
+  const { spawn } = await import('node:child_process');
+  const { fileURLToPath } = await import('node:url');
+  const DEVNET = 'EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG';
+  const asked = [];
+  const server = createServer((request, response) => {
+    let body = '';
+    request.on('data', chunk => { body += chunk; });
+    request.on('end', () => {
+      const { id, method } = JSON.parse(body);
+      asked.push(method);
+      const result = method === 'getGenesisHash' ? DEVNET : null;
+      response.setHeader('content-type', 'application/json');
+      response.end(JSON.stringify({ jsonrpc: '2.0', id, result }));
+    });
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  const url = `http://127.0.0.1:${server.address().port}`;
+  // Async on purpose: a synchronous spawn would block the event loop this
+  // server answers on, and the child would wait forever for a reply.
+  const run = args => new Promise(resolve => {
+    const child = spawn(process.execPath, ['bin/launch.mjs', ...args], { cwd: fileURLToPath(new URL('..', import.meta.url)) });
+    let output = '';
+    child.stdout.on('data', chunk => { output += chunk; });
+    child.stderr.on('data', chunk => { output += chunk; });
+    child.on('close', status => resolve({ status, output }));
+  });
+  try {
+    const bits = '1001001000010000000100000000000000000000000000000000000000000000';
+    const { status, output } = await run(['prepare', '--bitstring', bits, '--payer', addr(9), '--name', 'n', '--symbol', 's', '--uri', 'https://x/y', '--rpc', url]);
+    assert.equal(status, 1);
+    assert.match(output, /is on devnet, not mainnet-beta/);
+    assert.match(output, /--cluster devnet/, 'and says how to proceed if devnet was meant');
+    assert.deepEqual(asked, ['getGenesisHash'], 'no blockhash, no simulation — nothing else asked of the wrong cluster');
+  } finally {
+    server.close();
+  }
+});

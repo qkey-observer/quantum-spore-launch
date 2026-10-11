@@ -14,7 +14,7 @@ import { base58Decode, base58Encode } from '../src/derive/index.mjs';
 import { mintAddressFromBitstring, mintKeypairFromBitstring, bondingCurveFor } from '../src/derive/pump.mjs';
 import { buildLaunchTransaction } from '../src/launch/pump-create.mjs';
 import { assertSigned, DEFAULT_RPC, latestBlockhash, send, simulate } from '../src/launch/broadcast.mjs';
-import { createSolanaClient, GENESIS_HASHES } from '../src/chains/solana.mjs';
+import { createSolanaClient, GENESIS_HASHES, readCluster } from '../src/chains/solana.mjs';
 import { defaultRecipients, devBuyInstructions, LAUNCH_LOOKUP_TABLE, quoteTokensForLamports, readGlobalState, readLookupTable } from '../src/launch/pump-buy.mjs';
 import { PROGRAMS } from '../src/launch/pump-create.mjs';
 
@@ -31,13 +31,19 @@ const USAGE = `
 usage:
   launch prepare --bitstring <bits> --payer <pubkey> --name <n> --symbol <s> --uri <url>
                  [--buy <SOL>] [--creator <pubkey>] [--creator-fee-bps <n>] [--mayhem]
-                 [--cashback] [--holder-reward] [--out <file.json>] [--no-simulate] [--rpc <url>]
+                 [--cashback] [--holder-reward] [--out <file.json>] [--no-simulate]
+                 [--rpc <url>] [--cluster <name>] [--lookup-table <pubkey>]
   launch sign    --in <file.json> --bitstring <bits> --payer-keypair <path.json> [--out <file.json>]
-  launch send    --in <file.json> --yes [--rpc <url>]
+  launch send    --in <file.json> --yes [--rpc <url>] [--cluster <name>]
   launch verify  --bitstring <bits> [--mint <pubkey>] [--onchain] [--rpc <url>]
 
 <bits> is the measured bitstring, e.g. 10010010000100000001…  (0s and 1s only)
 <pubkey> is a base58 Solana address, e.g. 7BqXuedSVx3fETcDsvmZPqTw4dEvtPGhkHwhc5yMD6st
+
+--cluster defaults to mainnet-beta. The node at --rpc is identified by its
+genesis hash before anything is prepared or sent, and a different cluster is
+refused unless named here — a launch on devnet that its maker believes is on
+mainnet is the failure this exists for.
 
 --buy adds the dev buy to the same transaction. Without it the first buy of the
 token is open to whoever is watching, and the creator holds none of it.
@@ -45,6 +51,24 @@ token is open to whoever is watching, and the creator holds none of it.
 The mint is derived from the bitstring, which means the bitstring is the mint's
 private key. Publish the address before the launch and the bitstring after it.
 `;
+
+/**
+ * Identify the cluster behind --rpc by its genesis hash, and refuse any other
+ * than the one expected.
+ *
+ * Without this, pointing --rpc at devnet prepares, simulates and signs a devnet
+ * launch while every line of output reads as if it were real. Nothing about the
+ * transaction looks wrong; it is simply on the wrong network. The genesis hash
+ * is the one answer a node cannot give for a cluster it is not on.
+ */
+async function requireCluster(expected = flag('cluster') ?? 'mainnet-beta') {
+  if (!Object.hasOwn(GENESIS_HASHES, expected)) die(`--cluster must be one of ${Object.keys(GENESIS_HASHES).join(', ')}, not ${expected}.`);
+  const { cluster } = await readCluster(createSolanaClient({ rpcUrl: rpc }));
+  if (cluster !== expected) {
+    die(`${new URL(rpc).host} is on ${cluster === 'unknown' ? 'an unknown cluster' : cluster}, not ${expected}.${expected === 'mainnet-beta' ? '\nIf that is intended, say so with --cluster ' + (cluster === 'unknown' ? '<name>' : cluster) + '.' : ''}`);
+  }
+  return cluster;
+}
 
 /**
  * Check an address here rather than letting it fail several layers down. The
@@ -86,7 +110,10 @@ async function prepare() {
   if (buySol !== null && !(Number(buySol) > 0)) die(`--buy takes an amount of SOL greater than 0, not ${buySol}.`);
   const mint = mintAddressFromBitstring(bitstring);
   const curve = bondingCurveFor(mint);
-  // Only now is the network touched: everything above can fail for free.
+  // Only now is the network touched: everything above can fail for free. The
+  // cluster comes first, because a blockhash from the wrong one would make
+  // everything after it valid in the wrong place.
+  const cluster = has('no-simulate') ? null : await requireCluster();
   const blockhash = has('no-simulate') ? base58Encode(new Uint8Array(32)) : (await latestBlockhash(rpc)).blockhash;
 
   // The dev buy needs the launchpad's fee recipient pools and starting
@@ -116,6 +143,7 @@ async function prepare() {
     lookupTables,
   });
 
+  console.log(`cluster       ${cluster ?? 'not checked (--no-simulate)'}`);
   console.log(`mint          ${mint}`);
   console.log(`bonding curve ${curve.address}  bump ${curve.bump}`);
   console.log(`payer         ${payer}`);
@@ -148,7 +176,7 @@ async function prepare() {
   if (!out) { console.log(`\n${tx.transactionBase64}`); return; }
   // The bitstring is deliberately not written: it is the mint's private key,
   // and this file is meant to be safe to keep, copy and inspect.
-  writeFileSync(out, `${JSON.stringify({ mint, curve: curve.address, payer, creator, blockhash, transactionBase64: tx.transactionBase64, signers: tx.signatureSlots, bitstringIsMintKey: true }, null, 2)}\n`);
+  writeFileSync(out, `${JSON.stringify({ cluster, mint, curve: curve.address, payer, creator, blockhash, devBuyLamports: devBuy ? String(devBuy.lamports) : null, transactionBase64: tx.transactionBase64, signers: tx.signatureSlots, bitstringIsMintKey: true }, null, 2)}\n`);
   console.log(`\nwrote ${out} — unsigned, and without the bitstring. Nothing has been sent.`);
 }
 
@@ -194,8 +222,12 @@ async function sendCommand() {
   // Before the network, before --yes: an unsigned file is a mistake worth
   // naming plainly rather than letting a cluster error stand in for it.
   try { assertSigned(doc.transactionBase64); } catch (error) { die(error.message); }
+  // The file records the cluster it was prepared against. Sending it anywhere
+  // else is either a mistake or a launch somebody did not mean to make.
+  const cluster = await requireCluster(flag('cluster') ?? doc.cluster ?? 'mainnet-beta');
+  if (doc.cluster && doc.cluster !== cluster) die(`This transaction was prepared on ${doc.cluster}, and ${new URL(rpc).host} is on ${cluster}.`);
   if (!has('yes')) {
-    console.log(`Would submit the launch of ${doc.mint} to ${new URL(rpc).host}.`);
+    console.log(`Would submit the launch of ${doc.mint} to ${cluster} via ${new URL(rpc).host}.`);
     console.log('This cannot be undone, and after it lands the bitstring is safe to publish.');
     console.log('Add --yes to actually send it.');
     return;
